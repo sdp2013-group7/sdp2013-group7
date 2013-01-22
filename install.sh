@@ -106,8 +106,8 @@ function install_neuroph {
 }
 
 cleanup
-install_lejos
-install_bluetooth
+#install_lejos
+#install_bluetooth
 install_slf4j # Seems to be required for the physics demo and reflections
 #install_jbullet
 install_jbox2d
