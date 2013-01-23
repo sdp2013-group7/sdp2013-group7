@@ -1,0 +1,30 @@
+/////////////////////////////////////////////////
+
+  NEUROPH - JAVA NEURAL NETWORK FRAMEWORK
+  http://neuroph.sourceforge.net
+
+/////////////////////////////////////////////////
+
+
+This is the 2.6 release of the Neuroph framework
+
+This release brings many many important new features:
+
+1. Android support for image recognition plugin
+2. Improverd image recognition wizard in Neuroph Studio
+3. Data normlization support (Max, MaxMin, DecimalScale)
+4. Weight randomization techniques (Range, Distort, Gaussian, NguyenWidrow)
+5. Input and output adapters for reading and writing data to files, url, databaes or stream
+6. Simple microbenchmarking framework
+7. Some Unit tests
+8. New learning rules: Resilient Propagation, Anti Hebbian Learning, Generalized Hebbian Learning
+9. New transfer functions: sin, log
+10. JUnit tests for the core package
+
+There are also some changes in framework structure:
+
+1. TrainingSet class now use generics to specify type of training elements (unsupervised or supervised)
+2. Attribute value in Weight class is made public in order to avoid too many getters and setters, make code more readable, and improve performane
+3. To avoid confusion, method learnInSameThread is deprecated, and should not be used. Instead this method, the method learn should be used. 
+
+As of this version easyNeurons GUI is not supported anymore, and Neuroph Studio shoul dbe used instead.
