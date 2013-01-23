@@ -1,6 +1,8 @@
-SDP Group  4
+SDP Group  7
 =========
 
+2013
+===
 Installation
 ---------------------------
 All dependancies you will need should be installed by `install.sh` script.
@@ -52,3 +54,14 @@ where -p is 0 for the main pitch, or 1 for the other one. See vision.py --help f
     
 To switch between thresholding options for yellow/blue robots and the ball, press `y`, `b` and `r` respectively.
 To toggle between the raw image or the channel currently being thresholded, press `t`.
+
+Further information
+-----------------
+
+The vision will sometimes break - due to currently unknown reasons. In order to fix it run:
+    ./vision/runvision.sh -p(0|1) -r
+
+This will reset the last known configuration and will restore the vision to a working condition.
+Make sure to ALWAYS reset the configuration when switching between cameras and computers.
+
+It's currently unknown if the system works on flip-desk computers.
