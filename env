@@ -1,4 +1,4 @@
-BASE="/group/teaching/sdp/sdp4/secure"
+BASE="/group/teaching/sdp/archive/SDP2012/sdp4/secure"
 
 export PYTHONPATH=$PYTHONPATH:$BASE/libs/lib/python2.6/site-packages
 export LOCALBASE=$LOCALBASE:$BASE/libs
