@@ -5,6 +5,7 @@
 ./balle/logging/ANSIColorLayout.java
 ./balle/logging/NewLogForEachRunFileAppender.java
 ./balle/logging/StrategyLogAppender.java
+./balle/main/Run.java
 ./balle/main/Config.java
 ./balle/main/GUITab.java
 ./balle/main/Runner.java
