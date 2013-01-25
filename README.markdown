@@ -3,6 +3,19 @@ SDP Group  7
 
 2013
 ===
+
+Thresholds for the vision system.
+-----------------------------------------------
+Press y, b or r in the thresh_adjust window to switch between colours.
+
+For pitch 1:
+Blue: Hmin 79, Smin 78, Vmin 135, Hmax 136, Smax 255, Vmax 255
+Yellow: Hmin 0, Smin 0, Vmin 250, Hmax 255, Smax 255, Vmax 255
+
+For pitch 0:
+Blue: 
+Yellow:
+
 Installation
 ---------------------------
 All dependancies you will need should be installed by `install.sh` script.
