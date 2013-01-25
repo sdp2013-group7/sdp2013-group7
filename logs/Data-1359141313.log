@@ -1,0 +1,6 @@
+[25/Jan 19:15:14] DEBUG : org.reflections.Reflections - going to scan these urls:
+	file:/afs/inf.ed.ac.uk/user/s10/s1039549/SDP/sdp2013-group7/bin/
+
+[25/Jan 19:15:14] INFO : org.reflections.Reflections - Reflections took 483 ms to scan 1 urls, producing 77 keys and 198 values 
+[25/Jan 19:15:14] DEBUG : balle.strategy.StrategyFactory - Found 19 runnable strategies
+[25/Jan 19:15:14] INFO : balle.strategy.StrategyRunner - StrategyRunner initialised
