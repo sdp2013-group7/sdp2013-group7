@@ -26,14 +26,14 @@ public class BrickController implements Controller {
     public final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
     public final NXTRegulatedMotor KICKER = Motor.A;
 
-    public final boolean INVERSE_WHEELS = true;
+    public final boolean INVERSE_WHEELS = false;
 
     public final float WHEEL_DIAMETER = 0.0816f; // metres
     public final float TRACK_WIDTH = 0.155f; // metres
 
-    public static final int MAXIMUM_MOTOR_SPEED = 900;
+    public static final int MAXIMUM_MOTOR_SPEED = 2000;
 
-    public static final int GEAR_ERROR_RATIO = 2; // Gears cut our turns in half
+    public static final int GEAR_ERROR_RATIO = 3/5; // Gears cut our turns in half
 
     private volatile boolean isKicking = false;
 
@@ -88,11 +88,14 @@ public class BrickController implements Controller {
 
         isKicking = true;
 
-        KICKER.setSpeed(KICKER.getMaxSpeed());
+        int acceleration = 12000;
+
+        KICKER.setSpeed(MAXIMUM_MOTOR_SPEED);
+        KICKER.setAcceleration(acceleration);
         KICKER.resetTachoCount();
         //KICKER.backward();
         
-        KICKER.rotateTo(-30);
+        KICKER.forward();
 
         new Thread(new Runnable() {
             @Override
