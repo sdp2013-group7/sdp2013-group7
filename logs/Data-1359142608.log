@@ -1,0 +1,19 @@
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - open using BlueCove javax.microedition.io.Connector
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - connecting btspp://001653089FAF:1;authenticate=false;encrypt=false
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - Java 1.4+ detected: 1.6.0_24; OpenJDK 64-Bit Server VM; Sun Microsystems Inc.
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - Use stack ClassLoader
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - Library loaded from /tmp/bluecove_s1039549_0/libbluecove_x64.so
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - BluetoothStack selected bluez
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - nativeDebugCallback ON
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - localDeviceID 0
+[25/Jan 19:36:48] DEBUG : com.intel.bluetooth - RFCOMM connect, channel 1
+[25/Jan 19:36:55] DEBUG : com.intel.bluetooth - RFCOMM connected, handle 51
+[25/Jan 19:36:55] DEBUG : com.intel.bluetooth - new RemoteDevice 001653089FAF
+[25/Jan 19:36:55] DEBUG : com.intel.bluetooth - new devicesCashed 0x1653089faf
+[25/Jan 19:36:55] DEBUG : com.intel.bluetooth - connection open, open now 1
+[25/Jan 19:36:56] DEBUG : org.reflections.Reflections - going to scan these urls:
+	file:/afs/inf.ed.ac.uk/user/s10/s1039549/SDP/sdp2013-group7/bin/
+
+[25/Jan 19:36:56] INFO : org.reflections.Reflections - Reflections took 211 ms to scan 1 urls, producing 77 keys and 198 values 
+[25/Jan 19:36:56] DEBUG : balle.strategy.StrategyFactory - Found 19 runnable strategies
+[25/Jan 19:36:56] INFO : balle.strategy.StrategyRunner - StrategyRunner initialised
