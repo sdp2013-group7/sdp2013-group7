@@ -17,6 +17,7 @@ import balle.bluetooth.messages.MessageMove;
 import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
 import balle.controller.Controller;
+import balle.brick.BrickController;
 
 class ListenerThread extends Thread {
     DataInputStream input;
@@ -80,7 +81,7 @@ public class Roboto {
      * @return true, if successful
      */
     public static boolean processMessage(AbstractMessage decodedMessage,
-            Controller controller) {
+            BrickController controller) {
         String name = decodedMessage.getName();
 
         if (name.equals(MessageKick.NAME)) {
@@ -102,8 +103,9 @@ public class Roboto {
                 controller.stop();
         } else if (name.equals(MessageRotate.NAME)) {
             MessageRotate messageRotate = (MessageRotate) decodedMessage;
-            controller.rotate(messageRotate.getAngle(),
-                    messageRotate.getSpeed());
+//            controller.rotate(messageRotate.getAngle(),
+//                    messageRotate.getSpeed());
+            controller.drive();
         } else {
             return false;
         }
@@ -139,7 +141,7 @@ public class Roboto {
             DataInputStream input = connection.openDataInputStream();
             ListenerThread listener = new ListenerThread(input);
 
-            Controller controller = new BrickController();
+            BrickController controller = new BrickController();
             MessageDecoder decoder = new MessageDecoder();
 
             listener.start();
