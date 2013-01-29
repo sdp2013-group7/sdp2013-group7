@@ -60,41 +60,14 @@ public class starterUI {
 		btnPitch.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// Code for Pitch 0.
-				Process p = null;
-				Process vision = null;
-				try {
-					// FIRST COMMAND. EDIT HERE.
-					p = Runtime.getRuntime().exec(
-							new String[] { "bash", "-c", "sh run.sh -p0 " });
-					vision = Runtime.getRuntime().exec(
-							new String[] { "bash", "-c",
-									"sh vision/runvision.sh -p0 -r" });
-
-				} catch (IOException ex) {
-					Logger.getLogger(starterUI.class.getName()).log(
-							Level.SEVERE, null, ex);
-				}
-				// Now read the output
-				StringBuilder out = new StringBuilder();
-				StringBuilder out2 = new StringBuilder();
-				BufferedReader br = new BufferedReader(new InputStreamReader(p
-						.getInputStream()));
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(
-						vision.getInputStream()));
-				String line = null, previous = null;
-				try {
-					while ((line = br.readLine()) != null) {
-						if (!line.equals(previous)) {
-							previous = line;
-							out.append(line).append('\n');
-							System.out.println(line);
-						}
-					}
-				} catch (IOException ex) {
-					Logger.getLogger(starterUI.class.getName()).log(
-							Level.SEVERE, null, ex);
-				}
+				//Run the system threaded.
+				systemRunnable system = new systemRunnable();
+				system.setPitch(0);
+				system.run();
+				//Run the vision threaded.
+				visionRunnable vision = new visionRunnable();
+				vision.setPitch(0);
+				vision.run();
 
 			}
 
@@ -116,42 +89,14 @@ public class starterUI {
 		btnStartDummy.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// Code for dummy System start.
-				Process p = null;
-				Process vision = null;
-				try {
-					// FIRST COMMAND. EDIT HERE.
-					p = Runtime.getRuntime().exec(
-							new String[] { "bash", "-c", "sh run.sh -p0 -d" });
-					vision = Runtime.getRuntime().exec(
-							new String[] { "bash", "-c",
-									"sh vision/runvision.sh -p0 -r" });
-
-				} catch (IOException ex) {
-					Logger.getLogger(starterUI.class.getName()).log(
-							Level.SEVERE, null, ex);
-				}
-				// Now read the output
-				StringBuilder out = new StringBuilder();
-				StringBuilder out2 = new StringBuilder();
-				BufferedReader br = new BufferedReader(new InputStreamReader(p
-						.getInputStream()));
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(
-						vision.getInputStream()));
-				String line = null, previous = null;
-				try {
-					while ((line = br.readLine()) != null) {
-						if (!line.equals(previous)) {
-							previous = line;
-							out.append(line).append('\n');
-							System.out.println(line);
-						}
-					}
-				} catch (IOException ex) {
-					Logger.getLogger(starterUI.class.getName()).log(
-							Level.SEVERE, null, ex);
-				}
-
+				//Run the system threaded.
+				systemRunnable system = new systemRunnable();
+				system.setPitch(1);
+				system.run();
+				//Run the vision threaded.
+				visionRunnable vision = new visionRunnable();
+				vision.setPitch(1);
+				vision.run();
 			}
 		});
 
