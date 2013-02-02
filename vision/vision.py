@@ -5,7 +5,6 @@ import time
 import math
 import socket
 import cv
-
 from optparse import OptionParser
 
 from SimpleCV import Image, Camera, VirtualCamera
@@ -149,6 +148,8 @@ class Vision:
     def send(self, string):
         if self.stdout:
             sys.stdout.write(string)
+	    h = hpy()
+	    h.heap()
         else:
             self.socket.send(string)
 
