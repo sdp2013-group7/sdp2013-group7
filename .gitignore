@@ -6,3 +6,11 @@
 *~
 log.txt
 vision.bak/
+
+# Eclipse stuff, paths are different for everyone
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+
+# Ant buildfile, paths are different for everyone, generate your own
+build.xml
