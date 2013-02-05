@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 public class starterUI {
 
+	
 	private JFrame frame;
-
 	/**
 	 * Launch the application.
 	 */
@@ -61,13 +61,16 @@ public class starterUI {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//Run the system threaded.
+
 				systemRunnable system = new systemRunnable();
 				system.setPitch(0);
-				system.run();
+				Thread t1 = new Thread(system);
+				t1.start();
 				//Run the vision threaded.
 				visionRunnable vision = new visionRunnable();
 				vision.setPitch(0);
-				vision.run();
+				Thread t2 = new Thread(vision);
+				t2.start();
 
 			}
 
