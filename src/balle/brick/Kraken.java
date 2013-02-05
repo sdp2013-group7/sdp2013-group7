@@ -69,7 +69,7 @@ class ListenerThread extends Thread {
  * 
  * @author s0815695
  */
-public class Roboto {
+public class Kraken {
 
     /**
      * Processes the decoded message and issues correct commands to controller

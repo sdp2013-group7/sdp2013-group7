@@ -3,8 +3,8 @@ rm balle/bluetooth/*.class
 rm balle/bluetooth/messages/*.class
 rm balle/controller/BluetoothController.class
 
-nxjc balle/bluetooth/messages/*.java balle/controller/Controller.java balle/brick/BrickController.java balle/brick/Roboto.java balle/brick/Kick.java balle/brick/Drive.java balle/brick/milestone1/RollAndKick.java balle/brick/milestone1/RollThroughField.java balle/brick/PenaltyKick.java balle/brick/TestThroughput.java \
-&& nxjlink balle.brick.Roboto -o Roboto.nxj \
+nxjc balle/bluetooth/messages/*.java balle/controller/Controller.java balle/brick/BrickController.java balle/brick/Kraken.java balle/brick/Kick.java balle/brick/Drive.java balle/brick/milestone1/RollAndKick.java balle/brick/milestone1/RollThroughField.java balle/brick/PenaltyKick.java balle/brick/TestThroughput.java \
+&& nxjlink balle.brick.Kraken -o Kraken.nxj \
 && nxjlink balle.brick.Kick -o M1Kick.nxj \
 && nxjlink balle.brick.Drive -o M1Drive.nxj \
 && nxjlink balle.brick.PenaltyKick -o M1PenaltyKick.nxj \
