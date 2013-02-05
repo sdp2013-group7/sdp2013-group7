@@ -1,4 +1,4 @@
-package src;
+package starterUI;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
