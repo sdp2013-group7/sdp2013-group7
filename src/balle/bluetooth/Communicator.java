@@ -9,7 +9,7 @@ import lejos.pc.comm.NXTConnector;
 
 public class Communicator {
 
-    private final static String NAME      = "Hacktar";
+    private final static String NAME      = "Kraken";
     private final static String MAC       = "00:16:53:08:9F:AF";
 
     private boolean             connected = false;

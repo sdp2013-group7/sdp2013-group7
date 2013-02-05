@@ -10,7 +10,7 @@ import balle.controller.BluetoothController;
 
 /*
     A simple class to control the robot over bluetooth by
-    typing different commands on the command line. Roboto.nxj must
+    typing different commands on the command line. Kraken.nxj must
     be running on the robot before running this.
 */
 public class Run {

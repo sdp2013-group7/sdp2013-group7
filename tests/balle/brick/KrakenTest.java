@@ -15,7 +15,7 @@ import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
 import balle.controller.Controller;
 
-public class RobotoTest {
+public class KrakenTest {
     Controller controller;
 
     @Before
@@ -37,7 +37,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).kick();
     }
 
@@ -55,7 +55,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).penaltyKick();
     }
 
@@ -72,7 +72,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).stop();
     }
 
@@ -90,7 +90,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).floatWheels();
     }
 
@@ -108,7 +108,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).rotate(180, 70);
     }
 
@@ -126,7 +126,7 @@ public class RobotoTest {
             // Shouldn't happen
         }
 
-        assertTrue(Roboto.processMessage(message, controller));
+        assertTrue(Kraken.processMessage(message, controller));
         verify(controller).setWheelSpeeds(500, 600);
     }
 }
