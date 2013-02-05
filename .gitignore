@@ -3,6 +3,6 @@
 *.pyc
 *.log
 .__afsC4A4
-env~
+*~
 log.txt
 vision.bak/
