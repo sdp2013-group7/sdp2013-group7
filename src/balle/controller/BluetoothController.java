@@ -9,6 +9,7 @@ import balle.bluetooth.messages.MessageKick;
 import balle.bluetooth.messages.MessageMove;
 import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
+import balle.bluetooth.messages.MessageForward;
 import balle.brick.BrickController;
 import balle.strategy.bezierNav.ControllerHistoryElement;
 
@@ -84,10 +85,11 @@ public class BluetoothController implements Controller {
      * 
      * @see balle.controller.Controller#forward(int)
      */
+    // Testing a 3 bit opcode
     @Override
     public void forward(int speed) {
         try {
-            connection.send(new MessageMove(speed, speed).hash());
+            connection.send(new MessageForward(speed).hash());
 			propogate(speed, speed);
         } catch (InvalidOpcodeException e) {
             System.err
@@ -97,6 +99,18 @@ public class BluetoothController implements Controller {
                     + "-- invalid argument");
         }
     }
+//    public void forward(int speed) {
+//        try {
+//            connection.send(new MessageMove(speed, speed).hash());
+//			propogate(speed, speed);
+//        } catch (InvalidOpcodeException e) {
+//            System.err
+//                    .println("Failed to send message FORWARD -- invalid opcode");
+//        } catch (InvalidArgumentException e) {
+//            System.err.println("Failed to send message FORWARD(" + speed + ")"
+//                    + "-- invalid argument");
+//        }
+//    }
 
     @Override
     public void rotate(int degrees, int speed) {

@@ -9,13 +9,13 @@ public abstract class AbstractTwoArgMessage extends AbstractMessage {
 
     private void validateArgument(int argument) throws InvalidArgumentException {
         if (argument < 0) {
-            throw new InvalidArgumentException("Provided argument " + arg1
+            throw new InvalidArgumentException("Provided argument " + argument
                     + " is < 0. Arguments should be unsigned. "
                     + " If you need a negative valued one, consider offsetting it "
                     + " so it is always positive.");
 
         } else if (argument > (int) Math.pow(2, BITS_PER_ARGUMENT) - 1) {
-            throw new InvalidArgumentException("Provided argument " + arg1
+            throw new InvalidArgumentException("Provided argument " + argument
                     + " exceeds number of bits per argument");
         }
     }
@@ -38,8 +38,8 @@ public abstract class AbstractTwoArgMessage extends AbstractMessage {
      * @return int[] of arguments of structure {firstArgument, secondArgument}
      */
     public static int[] decodeArgumentsFromHash(int hash) {
-        int firstArgument = (hash & 0x3FFF8000) >>> BITS_PER_ARGUMENT;
-        int secondArgument = hash & 0x0007FFF;
+        int firstArgument = (hash & 0x0FFFC000) >>> BITS_PER_ARGUMENT;
+        int secondArgument = hash & 0x0003FFF;
 
         int[] result = { firstArgument, secondArgument };
         return result;

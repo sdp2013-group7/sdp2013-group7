@@ -16,6 +16,7 @@ import balle.bluetooth.messages.MessageKick;
 import balle.bluetooth.messages.MessageMove;
 import balle.bluetooth.messages.MessageRotate;
 import balle.bluetooth.messages.MessageStop;
+import balle.bluetooth.messages.MessageForward;
 import balle.controller.Controller;
 
 class ListenerThread extends Thread {
@@ -104,6 +105,9 @@ public class Kraken {
             MessageRotate messageRotate = (MessageRotate) decodedMessage;
             controller.rotate(messageRotate.getAngle(),
                     messageRotate.getSpeed());
+        } else if (name.equals(MessageForward.NAME)) {
+        	MessageForward messageForward = (MessageForward) decodedMessage;
+        	controller.forward(messageForward.getArgument());
         } else {
             return false;
         }
@@ -196,7 +200,8 @@ public class Kraken {
                     }
 
                 } catch (Exception e1) {
-                    drawMessage("Error in MainLoop: " + e1.getMessage());
+                	drawMessage("Error in MainLoop: " + e1.getMessage());
+                	// TODO: Make it throw it instead? Will get a full stacktrace on the LCD.
                 }
             }
 

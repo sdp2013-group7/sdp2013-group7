@@ -35,6 +35,9 @@ public class MessageDecoder {
                 int floatWheels = MessageStop
                         .decodeArgumentsFromHash(hashedMessage);
                 return new MessageStop(floatWheels);
+            case MessageForward.OPCODE:
+            	int speed = MessageForward.decodeArgumentsFromHash(hashedMessage);
+            	return new MessageForward(speed);
             default:
                 // Unknown type
                 return null;

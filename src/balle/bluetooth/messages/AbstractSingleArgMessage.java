@@ -33,7 +33,7 @@ public abstract class AbstractSingleArgMessage extends AbstractMessage {
     }
 
     public static int decodeArgumentsFromHash(int hash) {
-        return hash & 0x3FFFFFFF;
+        return hash & 0x0FFFFFFF;
     }
 
     public int getArgument() {
