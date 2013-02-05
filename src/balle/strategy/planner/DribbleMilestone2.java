@@ -7,6 +7,7 @@ import balle.strategy.ConfusedException;
 import balle.strategy.executor.dribbling.DribbleStraight;
 import balle.world.Coord;
 import balle.world.Snapshot;
+import balle.strategy.FactoryMethod;
 
 public class DribbleMilestone2 extends AbstractPlanner {
 
@@ -48,5 +49,16 @@ public class DribbleMilestone2 extends AbstractPlanner {
             }
         }
 
+    }
+    
+    @Override
+    public void stop(Controller controller) {
+		executor.stop(controller);
+
+    }
+    
+    @FactoryMethod(designator = "Dribble Milestone 2", parameterNames = {})
+    public static final DribbleMilestone2 factory() {
+        return new DribbleMilestone2();
     }
 }
