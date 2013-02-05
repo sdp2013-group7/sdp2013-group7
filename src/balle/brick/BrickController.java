@@ -44,8 +44,9 @@ public class BrickController implements Controller {
                 RIGHT_WHEEL, INVERSE_WHEELS);
         pilot.setMoveSpeed(maxPilotSpeed);
         pilot.setTurnSpeed(45); // 45 has been working fine.
-        LEFT_WHEEL.setAcceleration(250);
-        RIGHT_WHEEL.setAcceleration(250);
+        // TODO: Check the acceleration values with the robot when it's done
+//        LEFT_WHEEL.setAcceleration(250);
+//        RIGHT_WHEEL.setAcceleration(250);
         //pilot.regulateSpeed(true);
         //LEFT_WHEEL.regulateSpeed(true);
         //RIGHT_WHEEL.regulateSpeed(true);
@@ -170,12 +171,14 @@ public class BrickController implements Controller {
         return MAXIMUM_MOTOR_SPEED;
     }
 
+    // Not used at the moment, setWheelSpeeds gets called instead
     @Override
     public void backward(int speed) {
         pilot.setMoveSpeed(speed);
         pilot.backward();
     }
 
+    // Not used at the moment, setWheelSpeeds gets called instead
     @Override
     public void forward(int speed) {
         pilot.setMoveSpeed(speed);
@@ -183,6 +186,7 @@ public class BrickController implements Controller {
 
     }
 
+    // The function used for Milestone 1
     public void drive() {
         boolean movingForward = false;
         double ROLL_DISTANCE = 1.2;
