@@ -4,61 +4,87 @@ import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.strategy.ConfusedException;
-import balle.strategy.executor.dribbling.DribbleStraight;
-import balle.world.Coord;
-import balle.world.Snapshot;
 import balle.strategy.FactoryMethod;
+import balle.strategy.Strategy;
+import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.turning.IncFaceAngle;
+import balle.strategy.executor.turning.RotateToOrientationExecutor;
+import balle.strategy.planner.AbstractPlanner;
+import balle.world.Snapshot;
+import balle.world.objects.Ball;
+import balle.world.objects.Robot;
 
 public class DribbleMilestone2 extends AbstractPlanner {
 
-    private static final Logger LOG                = Logger.getLogger(DribbleMilestone2.class);
+	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
+	// Strategies that we will need make sure to updateState() for each of them
+	// and stop() each of them
 
-    DribbleStraight             executor;
-    Coord                       startingCoordinate = null;
-    private static final double DISTANCE_TO_TRAVEL = 0.6;                                      // in
-                                                                                                // metres
+	Strategy goToBallSafeStrategy;
+	RotateToOrientationExecutor turningExecutor;
 
-    public DribbleMilestone2() {
-        executor = new DribbleStraight();
-    }
+	public DribbleMilestone2() {
 
-    @Override
-    public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
+		// initialise strategies that will be used in game
 
-        if (startingCoordinate == null) {
-            if (executor.isPossible(snapshot)) {
-                startingCoordinate = snapshot.getBalle().getPosition(); // Set
-                                                                        // the
-                                                                        // starting
-                                                                        // position
-                LOG.info("Started dribbling");
-            } else {
-                LOG.warn("Cannot dribble from here. Move ball closer");
-                return;
-            }
-        } else {
-            Coord currentCoordinate = snapshot.getBalle().getPosition();
-            if (currentCoordinate == null)
-                return;
+		goToBallSafeStrategy = new GoToBallNoGoals(new GoToObjectPFN(0.15f));
+		// pickBallFromWallStrategy = new KickFromWall(new
+		// GoToObjectPFN(0.15f));
+		turningExecutor = new IncFaceAngle();
+	}
 
-            if (currentCoordinate.dist(startingCoordinate) < DISTANCE_TO_TRAVEL) {
-				executor.step(controller, snapshot);
-            } else {
-                LOG.info("Distance travelled. Finishing");
-                executor.stop(controller);
-            }
-        }
+	// method to stop strategies that would not usually stop themselves
+	@Override
+	public void stop(Controller controller) {
+		goToBallSafeStrategy.stop(controller);
+	}
 
-    }
-    
-    @Override
-    public void stop(Controller controller) {
-		executor.stop(controller);
+	@Override
+	public void onStep(Controller controller, Snapshot snapshot)
+			throws ConfusedException {
 
-    }
-    
-    @FactoryMethod(designator = "Dribble Milestone 2", parameterNames = {})
-    public static final DribbleMilestone2 factory() {
-        return new DribbleMilestone2();
-    }
+		// get position of our robot
+		Robot ourRobot = snapshot.getBalle();
+
+		// check if robot is actually on the pitch
+		if (ourRobot.getPosition() == null) {
+
+			LOG.info("where am i?!?!?!");
+			return;
+		}
+
+		// get positions of other useful objects on pitch
+
+		Ball ball = snapshot.getBall();
+		
+
+		// when we have possession
+		if (ourRobot.possessesBall(ball)) {
+
+			LOG.info("we have possession");
+	
+					controller.stop();
+				
+			
+		} 
+			// if robot is not near ball
+		 else {
+
+			LOG.info("going to ball");
+			// execute strategy
+			goToBallSafeStrategy.step(controller, snapshot);
+			// add visuals to camera stream
+			addDrawables(goToBallSafeStrategy.getDrawables());
+
+		}
+
+	}
+
+	// Factory method to make DribbleMilestone2 appear in the list of strats in
+	// the
+	// simulator
+	@FactoryMethod(designator = "DribbleMilestone2", parameterNames = {})
+	public static DribbleMilestone2 factoryMethod() {
+		return new DribbleMilestone2();
+	}
 }
