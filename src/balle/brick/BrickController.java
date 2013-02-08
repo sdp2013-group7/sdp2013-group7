@@ -27,15 +27,15 @@ public class BrickController implements Controller {
     public final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
     public final NXTRegulatedMotor KICKER = Motor.A;
 
-    public final boolean INVERSE_WHEELS = false;
+    public final boolean INVERSE_WHEELS = true;
 
-    public final float WHEEL_DIAMETER = 0.0816f; // metres
-    public final float TRACK_WIDTH = 0.155f; // metres
+    public final float WHEEL_DIAMETER = 0.0863f; // metres
+    public final float TRACK_WIDTH = 0.1117f; // metres
 
     public static final int MAXIMUM_MOTOR_SPEED = 2000;
 
-    // TODO: Fix the ration, make sure it's >= 1, otherwise will divide by 0
-    public static final int GEAR_ERROR_RATIO = 1; // Gears cut our turns in half
+    // TODO: Fix the ratio, make sure it's >= 1, otherwise will divide by 0
+    public static final float GEAR_ERROR_RATIO = (float) 5 / 3; // Gears cut our turns in half
 
     private volatile boolean isKicking = false;
 

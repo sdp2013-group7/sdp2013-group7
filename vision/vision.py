@@ -5,7 +5,7 @@ import time
 import math
 import socket
 import cv
-from guppy import hpy
+
 from optparse import OptionParser
 
 from SimpleCV import Image, Camera, VirtualCamera
@@ -84,9 +84,6 @@ class Vision:
         
     def connect(self):
         print("Attempting to connect...")
-	h = hpy()
-	print (h.heap())
-	print("DAFUQ")
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect( (HOST, PORT) )
         self.connected = True
@@ -152,8 +149,6 @@ class Vision:
     def send(self, string):
         if self.stdout:
             sys.stdout.write(string)
-	    h = hpy()
-	    h.heap()
         else:
             self.socket.send(string)
 
