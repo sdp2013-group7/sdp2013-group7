@@ -10,6 +10,7 @@ import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.world.Coord;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Robot;
@@ -56,6 +57,17 @@ public class NavigateMilestone2 extends AbstractPlanner {
 			
 			LOG.info("we have possession");
 			controller.stop();
+			
+			Coord ballPosition = snapshot.getBall().getPosition();
+			
+			double angle = ourRobot.getAngleToTurnToTarget(ballPosition);
+			
+			angle = Math.toDegrees(angle) / 2;
+						
+			if (angle > 10 || angle < -10) {
+				controller.rotate((int) angle, 50);
+				LOG.info("Angle: " + (int) angle);
+			}
 		} 
 		
 		// if robot is not near ball
