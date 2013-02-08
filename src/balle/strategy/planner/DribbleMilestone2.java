@@ -13,10 +13,14 @@ import balle.strategy.planner.AbstractPlanner;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Robot;
+import balle.world.Coord;
 
 public class DribbleMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
+	private static Coord startPosition;
+	private static final double distToTravel = 0.5;
+	private boolean reachedBall = false;
 
 	// create strategies to use
 	Strategy goToBallSafeStrategy;
@@ -39,7 +43,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 		// get position of our robot
 		Robot ourRobot = snapshot.getBalle();
-
+		
 		// check if robot is actually on the pitch
 		if (ourRobot.getPosition() == null) {
 			
@@ -54,8 +58,29 @@ public class DribbleMilestone2 extends AbstractPlanner {
 		//when we have possession
 		if (ourRobot.possessesBall(ball)) {
 			
-			LOG.info("we have possession");
-			controller.stop();
+			if (!reachedBall) {
+				goToBallSafeStrategy.stop(controller);
+				reachedBall = true;
+			}
+			LOG.info("Posess ball");
+			
+			if (startPosition == null) {
+				startPosition = ourRobot.getPosition();
+				LOG.info(startPosition);
+			}
+			
+			Coord robotPosition = ourRobot.getPosition();
+			
+			double dist = startPosition.dist(robotPosition);
+			
+			controller.setWheelSpeeds(100, 100);
+			
+			LOG.info("Distance travelled " + dist);
+			
+			if (dist > distToTravel) {
+				controller.stop();
+			}
+		
 		} 
 		
 		// if robot is not near ball
