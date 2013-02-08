@@ -59,29 +59,54 @@ public class DribbleMilestone2 extends AbstractPlanner {
 		Ball ball = snapshot.getBall();
 		
 
-		//when we have possession
+		// when we have possession
 		if (ourRobot.possessesBall(ball)) {
 			
+			// if we reach ball stop
 			if (!reachedBall) {
+				
 				goToBallSafeStrategy.stop(controller);
 				reachedBall = true;
 			}
+			
 			LOG.info("Posess ball");
 			
+			// if we don't have a previous start position set current to be start position
 			if (startPosition == null) {
+				
 				startPosition = ourRobot.getPosition();
 				LOG.info(startPosition);
 			}
 			
+			
+			Coord ballPosition = snapshot.getBall().getPosition();
+			
+			// get angle from where we are facing to ball
+			double angle = ourRobot.getAngleToTurnToTarget(ballPosition);
+			
+			// convert to degrees
+			angle = Math.toDegrees(angle) / 2;
+						
+			// if angle large (above 10 off) then turn to ball
+			if (angle > 10 || angle < -10) {
+				
+				controller.rotate((int) angle, 50);
+				LOG.info("Angle: " + (int) angle);
+			}
+			
 			Coord robotPosition = ourRobot.getPosition();
 			
+			// get distance from start position (where we got possession) to where robot is now
 			double dist = startPosition.dist(robotPosition);
 			
+			// drive forward
 			controller.setWheelSpeeds(150, 150);
 			
 			LOG.info("Distance travelled " + dist);
 			
+			// when distance driven reaches distance to travel then stop
 			if (dist > distToTravel) {
+				
 				controller.stop();
 				done = true;
 			}

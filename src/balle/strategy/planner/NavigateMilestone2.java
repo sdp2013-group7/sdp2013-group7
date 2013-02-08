@@ -52,19 +52,24 @@ public class NavigateMilestone2 extends AbstractPlanner {
 		Ball ball = snapshot.getBall();
 		
 
-		//when we have possession
+		// when we have possession
 		if (ourRobot.possessesBall(ball)) {
 			
 			LOG.info("we have possession");
+			// stop controller (make sure nothing else is currently using the controller)
 			controller.stop();
 			
 			Coord ballPosition = snapshot.getBall().getPosition();
 			
+			// get angle we need to turn to have ball in the centre of robot
 			double angle = ourRobot.getAngleToTurnToTarget(ballPosition);
 			
+			// convert to degrees
 			angle = Math.toDegrees(angle) / 2;
 						
+			// if angle is large enough (greater than 10) then turn to face ball
 			if (angle > 10 || angle < -10) {
+				
 				controller.rotate((int) angle, 50);
 				LOG.info("Angle: " + (int) angle);
 			}
