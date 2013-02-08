@@ -25,8 +25,8 @@ public class Globals {
     public static final float BALL_RADIUS = 0.02135f;
     public static final float ROBOT_WIDTH = 0.15f;
     public static final float ROBOT_LENGTH = 0.2f;
-    public static final float ROBOT_TRACK_WIDTH = 0.155f; // Meters
-    public static final float ROBOT_WHEEL_DIAMETER = 0.0816f; // Meters
+    public static final float ROBOT_TRACK_WIDTH = 0.1117f; // Meters
+    public static final float ROBOT_WHEEL_DIAMETER = 0.0863f; // Meters
 	
 	public static final Vec2 ROBOT_LEFT_WHEEL_POS = new Vec2(0,
 			-ROBOT_TRACK_WIDTH / 2);
