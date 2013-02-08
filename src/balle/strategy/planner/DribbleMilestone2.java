@@ -19,8 +19,9 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
 	private static Coord startPosition;
-	private static final double distToTravel = 0.5;
+	private static final double distToTravel = 0.35;
 	private boolean reachedBall = false;
+	private boolean done = false;
 
 	// create strategies to use
 	Strategy goToBallSafeStrategy;
@@ -41,6 +42,9 @@ public class DribbleMilestone2 extends AbstractPlanner {
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
+		if (done)
+			return;
+		
 		// get position of our robot
 		Robot ourRobot = snapshot.getBalle();
 		
@@ -50,7 +54,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 		LOG.info("where am i?!?!?!");
 		return;
 		}
-
+		
 		// get position of the ball
 		Ball ball = snapshot.getBall();
 		
@@ -73,12 +77,13 @@ public class DribbleMilestone2 extends AbstractPlanner {
 			
 			double dist = startPosition.dist(robotPosition);
 			
-			controller.setWheelSpeeds(100, 100);
+			controller.setWheelSpeeds(150, 150);
 			
 			LOG.info("Distance travelled " + dist);
 			
 			if (dist > distToTravel) {
 				controller.stop();
+				done = true;
 			}
 		
 		} 
