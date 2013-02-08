@@ -17,74 +17,63 @@ import balle.world.objects.Robot;
 public class DribbleMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
-	// Strategies that we will need make sure to updateState() for each of them
-	// and stop() each of them
 
+	// create strategies to use
 	Strategy goToBallSafeStrategy;
-	RotateToOrientationExecutor turningExecutor;
 
 	public DribbleMilestone2() {
 
-		// initialise strategies that will be used in game
-
+		// initialise strategies that will be used in milestone2
 		goToBallSafeStrategy = new GoToBallNoGoals(new GoToObjectPFN(0.15f));
-		// pickBallFromWallStrategy = new KickFromWall(new
-		// GoToObjectPFN(0.15f));
-		turningExecutor = new IncFaceAngle();
 	}
 
 	// method to stop strategies that would not usually stop themselves
 	@Override
 	public void stop(Controller controller) {
+		
 		goToBallSafeStrategy.stop(controller);
 	}
 
 	@Override
-	public void onStep(Controller controller, Snapshot snapshot)
-			throws ConfusedException {
+	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
 		// get position of our robot
 		Robot ourRobot = snapshot.getBalle();
 
 		// check if robot is actually on the pitch
 		if (ourRobot.getPosition() == null) {
-
-			LOG.info("where am i?!?!?!");
-			return;
+			
+		LOG.info("where am i?!?!?!");
+		return;
 		}
 
-		// get positions of other useful objects on pitch
-
+		// get position of the ball
 		Ball ball = snapshot.getBall();
 		
 
-		// when we have possession
+		//when we have possession
 		if (ourRobot.possessesBall(ball)) {
-
-			LOG.info("we have possession");
-	
-					controller.stop();
-				
 			
+			LOG.info("we have possession");
+			controller.stop();
 		} 
-			// if robot is not near ball
+		
+		// if robot is not near ball
 		 else {
 
 			LOG.info("going to ball");
-			// execute strategy
+			
+			// execute strategy to go to the ball
 			goToBallSafeStrategy.step(controller, snapshot);
 			// add visuals to camera stream
 			addDrawables(goToBallSafeStrategy.getDrawables());
-
 		}
-
 	}
 
-	// Factory method to make DribbleMilestone2 appear in the list of strats in
-	// the
-	// simulator
+	// Factory method to make DribbleMilestone2 appear in the list of strats in the simulator
 	@FactoryMethod(designator = "DribbleMilestone2", parameterNames = {})
 	public static DribbleMilestone2 factoryMethod() {
+		
 		return new DribbleMilestone2();
 	}
 }
