@@ -73,6 +73,7 @@ public class NavigateMilestone2 extends AbstractPlanner {
 				controller.rotate((int) angle, 50);
 				LOG.info("Angle: " + (int) angle);
 			}
+			
 		} 
 		
 		// if robot is not near ball

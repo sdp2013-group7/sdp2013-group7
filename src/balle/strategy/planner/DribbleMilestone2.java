@@ -19,7 +19,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
 	private static Coord startPosition;
-	private static final double distToTravel = 20; // usually 0.35(close to
+	private static final double distToTravel = 0.35; // usually 0.35(close to
 													// 30cm)
 	private boolean reachedBall = false;
 	private boolean done = false;
@@ -90,7 +90,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 			double angleFromBall = ourRobot.getAngleToTurnToTarget(ballPosition);
 
 			// convert to degrees
-			angleFromBall = Math.toDegrees(angleFromBall) / 2;
+			angleFromBall = Math.toDegrees(angleFromBall) / 4;
 
 			// if angle large (above 10 off) then turn to ball
 			if (angleFromBall > 10 || angleFromBall < -10) {
@@ -127,16 +127,19 @@ public class DribbleMilestone2 extends AbstractPlanner {
 				LOG.info("Anglefromgoal: " + (int) angleFromGoal);
 				LOG.info("Dribbling!");
 				
-				controller.stop();
+				
 				// when distance driven reaches distance to travel then stop
 				if (dist > distToTravel) {
-
+					
+					LOG.info("1111111111111111111111111111");
 					controller.stop();
 					done = true;
+					startPosition = null;
+					return;
 				}
 				
 				// drive forward
-				controller.setWheelSpeeds(150, 150);
+				controller.setWheelSpeeds(400, 400);
 				LOG.info("Distance travelled " + dist);
 				
 				
