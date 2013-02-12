@@ -18,7 +18,8 @@ import balle.world.Coord;
 public class DribbleMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
-	private static Coord startPosition;
+	private static Coord startPosition = null;
+	private static double dist = 0.0;
 	private static final double distToTravel = 0.35; // usually 0.35(close to
 														// 30cm)
 	private boolean reachedBall = false;
@@ -41,7 +42,6 @@ public class DribbleMilestone2 extends AbstractPlanner {
 	public void stop(Controller controller) {
 
 		goToBallSafeStrategy.stop(controller);
-		startPosition = null;
 	}
 
 	@Override
@@ -71,7 +71,6 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 			// if we reach ball stop
 			if (!reachedBall) {
-
 				goToBallSafeStrategy.stop(controller);
 				reachedBall = true;
 			}
@@ -84,6 +83,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 				startPosition = ourRobot.getPosition();
 				LOG.info(startPosition);
+				LOG.info("99999999999999999999999999999 GAY!!!!!!!!!");
 			}
 
 			// get positions
@@ -108,7 +108,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 			// get distance from start position (where we got possession) to
 			// where robot is now
-			double dist = startPosition.dist(robotPosition);
+			dist = startPosition.dist(robotPosition);
 
 			Coord ownGoal = snapshot.getOpponentsGoal().getPosition();
 			LOG.info("OwnGoalCoord:----- " + ownGoal);
@@ -140,8 +140,6 @@ public class DribbleMilestone2 extends AbstractPlanner {
 					LOG.info("DONE!!!!!! Distance: " + dist);
 					controller.stop();
 					done = true;
-					startPosition = null;
-					return;
 				}
 
 				// drive forward
