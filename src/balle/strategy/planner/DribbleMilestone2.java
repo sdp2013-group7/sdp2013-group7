@@ -20,9 +20,12 @@ public class DribbleMilestone2 extends AbstractPlanner {
 	private static final Logger LOG = Logger.getLogger(DribbleMilestone2.class);
 	private static Coord startPosition;
 	private static final double distToTravel = 0.35; // usually 0.35(close to
-													// 30cm)
+														// 30cm)
 	private boolean reachedBall = false;
 	private boolean done = false;
+	private boolean rotated = false;
+	private boolean rotatedToBall = false;
+	private boolean setSpeeds = false;
 
 	// create strategies to use
 	Strategy goToBallSafeStrategy;
@@ -38,6 +41,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 	public void stop(Controller controller) {
 
 		goToBallSafeStrategy.stop(controller);
+		startPosition = null;
 	}
 
 	@Override
@@ -63,7 +67,7 @@ public class DribbleMilestone2 extends AbstractPlanner {
 		Ball ball = snapshot.getBall();
 
 		// when we have possession
-		if (ourRobot.possessesBall(ball)) {
+		if (ourRobot.possessesBall(ball) || reachedBall) {
 
 			// if we reach ball stop
 			if (!reachedBall) {
@@ -84,19 +88,20 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 			// get positions
 			Coord ballPosition = snapshot.getBall().getPosition();
-			
 
 			// get angle from where we are facing to ball
-			double angleFromBall = ourRobot.getAngleToTurnToTarget(ballPosition);
+			double angleFromBall = ourRobot
+					.getAngleToTurnToTarget(ballPosition);
 
 			// convert to degrees
 			angleFromBall = Math.toDegrees(angleFromBall) / 4;
 
 			// if angle large (above 10 off) then turn to ball
-			if (angleFromBall > 10 || angleFromBall < -10) {
+			if ((angleFromBall > 10 || angleFromBall < -10) && !rotatedToBall) {
 
 				controller.rotate((int) angleFromBall, 50);
 				LOG.info("Angle: " + (int) angleFromBall);
+				rotatedToBall = true;
 			}
 
 			Coord robotPosition = ourRobot.getPosition();
@@ -107,42 +112,46 @@ public class DribbleMilestone2 extends AbstractPlanner {
 
 			Coord ownGoal = snapshot.getOpponentsGoal().getPosition();
 			LOG.info("OwnGoalCoord:----- " + ownGoal);
-			
-			
+			Coord turnTo = new Coord(ownGoal.getX(), ballPosition.getY());
+
 			// get angle off of goal
-			double angleFromGoal = Math.toDegrees(ourRobot.getAngleToTurnToTarget(ownGoal));
+			double angleFromGoal = Math.toDegrees(ourRobot
+					.getAngleToTurnToTarget(turnTo)) / 2;
 
 			// if angle large (above 10 off) then turn to goal
 			boolean angleLarge = angleFromGoal > 10 || angleFromGoal < -10;
-			
-			if (angleLarge) {
+
+			if (angleLarge && !rotated) {
 
 				controller.rotate((int) angleFromGoal, 50);
 				LOG.info("Anglefromgoal: " + (int) angleFromGoal);
 				LOG.info("Rotating");
+				rotated = true;
 			}
-			
-			if (!angleLarge) {
+
+			if (!angleLarge || rotated) {
 
 				LOG.info("Anglefromgoal: " + (int) angleFromGoal);
 				LOG.info("Dribbling!");
-				
-				
+
 				// when distance driven reaches distance to travel then stop
 				if (dist > distToTravel) {
-					
-					LOG.info("1111111111111111111111111111");
+
+					LOG.info("DONE!!!!!! Distance: " + dist);
 					controller.stop();
 					done = true;
 					startPosition = null;
 					return;
 				}
-				
+
 				// drive forward
-				controller.setWheelSpeeds(400, 400);
+				if (!setSpeeds) {
+					controller.setWheelSpeeds(100, 100);
+					setSpeeds = true;
+					LOG.info("setSpeeds");
+				}
 				LOG.info("Distance travelled " + dist);
-				
-				
+
 			}
 
 		}
