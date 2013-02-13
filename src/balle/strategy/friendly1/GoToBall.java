@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Dot;
 import balle.strategy.ConfusedException;
+import balle.strategy.FactoryMethod;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
@@ -302,6 +304,10 @@ public class GoToBall extends AbstractPlanner {
     @Override
     public void stop(Controller controller) {
         executorStrategy.stop(controller);
-
+    }
+    
+    @FactoryMethod(designator = "Friendly1 GT", parameterNames = {})
+    public static GoToBall factoryMethod() {
+        return new GoToBall(new GoToObjectPFN(0.15f), true);
     }
 }

@@ -18,6 +18,7 @@ import balle.world.objects.Robot;
 public class NavigateMilestone2 extends AbstractPlanner {
 
 	private static final Logger LOG = Logger.getLogger(NavigateMilestone2.class);
+	private boolean done = false;
 
 	// create strategies to use
 	Strategy goToBallSafeStrategy;
@@ -38,6 +39,9 @@ public class NavigateMilestone2 extends AbstractPlanner {
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 
+		if (done) {
+			return ;
+		}
 		// get position of our robot
 		Robot ourRobot = snapshot.getBalle();
 
@@ -58,6 +62,7 @@ public class NavigateMilestone2 extends AbstractPlanner {
 			LOG.info("we have possession");
 			// stop controller (make sure nothing else is currently using the controller)
 			controller.stop();
+			done = true;
 			
 			Coord ballPosition = snapshot.getBall().getPosition();
 			

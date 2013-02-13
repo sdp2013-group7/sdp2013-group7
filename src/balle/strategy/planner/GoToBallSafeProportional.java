@@ -22,7 +22,7 @@ import balle.world.objects.Robot;
 
 public class GoToBallSafeProportional extends GoToBall {
 
-    private static final double BALL_SAFE_GAP = 0.4;
+    private static final double BALL_SAFE_GAP = 0.5;
 
 	private final AbstractPlanner turnHack;
 
