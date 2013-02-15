@@ -124,7 +124,8 @@ public class Kraken {
         TouchSensor touchRight = new TouchSensor(SensorPort.S2);
         TouchSensor touchLeft = new TouchSensor(SensorPort.S1);
 
-        TouchSensor touchBackRight = new TouchSensor(SensorPort.S4);
+        // TODO: Fix this when the sensor multiplexer gets added
+        //TouchSensor touchBackRight = new TouchSensor(SensorPort.S4);
         TouchSensor touchBackLeft = new TouchSensor(SensorPort.S3);
 
         while (true) {
@@ -170,7 +171,7 @@ public class Kraken {
                     }
 
                     // Check for back sensors as well
-                    if (touchBackLeft.isPressed() || touchBackRight.isPressed()) {
+                    if (touchBackLeft.isPressed() /*|| touchBackRight.isPressed()*/) {
                         controller.setWheelSpeeds(
                                 controller.getMaximumWheelSpeed(),
                                 controller.getMaximumWheelSpeed());
@@ -200,7 +201,7 @@ public class Kraken {
                     }
 
                 } catch (Exception e1) {
-                	drawMessage("Error in MainLoop: " + e1.getMessage());
+                	//drawMessage("Error in MainLoop: " + e1.getMessage());
                 	// TODO: Make it throw it instead? Will get a full stacktrace on the LCD.
                 }
             }

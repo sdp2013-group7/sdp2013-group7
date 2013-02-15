@@ -3,9 +3,16 @@ package balle.brick;
 import balle.controller.Controller;
 import balle.controller.ControllerListener;
 import lejos.robotics.navigation.LegacyPilot;
+import lejos.nxt.BasicMotorPort;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import lejos.nxt.LCD;
+
+import lejos.nxt.addon.RCXMotor;
+import lejos.nxt.MotorPort;
+import lejos.nxt.I2CPort;
+import lejos.nxt.I2CSensor;
+import lejos.nxt.SensorPort;
 
 /**
  * The Control class. Handles the actual driving and movement of the bot, once
@@ -25,7 +32,12 @@ public class BrickController implements Controller {
 
     public final NXTRegulatedMotor LEFT_WHEEL = Motor.B;
     public final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
-    public final NXTRegulatedMotor KICKER = Motor.A;
+//    public final NXTRegulatedMotor KICKER = Motor.A;
+//    public final RCXMotor KICKER = new RCXMotor(MotorPort.A);
+//    public final RCXMotor KICKERB = new RCXMotor(MotorPort.B);
+    
+    public final I2CSensor MULTIPLEXER;
+    public final int MUX_ADDRESS = 0xB4;
 
     public final boolean INVERSE_WHEELS = true;
 
@@ -41,6 +53,39 @@ public class BrickController implements Controller {
 
     public BrickController() {
 
+    	I2CPort I2Cport = SensorPort.S4; //Assign port
+    	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
+    	
+    	MULTIPLEXER = new I2CSensor(I2Cport);
+    	
+    	// Register sweep
+    	// Sometimes refuses to work otherwise, documents say
+    	// the reason for this is unknown
+    	
+    	drawMessage("Start sweep");
+    	
+    	int counter;
+    	byte direction = (byte) 1;
+    	byte speed = (byte)200;
+    	
+    	MULTIPLEXER.setAddress(MUX_ADDRESS);
+    	
+    	for( counter = 0; counter <65; counter ++){ 
+    		MULTIPLEXER.sendData(0x01 + (2*counter),direction);
+    		MULTIPLEXER.sendData(0x02 + (2*counter),speed);
+    	}
+    	try{
+    		Thread.sleep(1000);
+    	} catch (Exception e) {
+    		
+    	}
+    	for( counter = 0; counter <65; counter ++){ 
+    		MULTIPLEXER.sendData(0x02 + (2*counter),direction);
+    		MULTIPLEXER.sendData(0x01 + (2*counter),speed);
+    	}
+    	
+    	drawMessage("Sweep done!");
+    	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
                 RIGHT_WHEEL, INVERSE_WHEELS);
         pilot.setMoveSpeed(maxPilotSpeed);
@@ -93,35 +138,63 @@ public class BrickController implements Controller {
 
         isKicking = true;
 
-        int acceleration = 12000;
+//        int acceleration = 12000;
 
-        KICKER.setSpeed(MAXIMUM_MOTOR_SPEED);
-        KICKER.setAcceleration(acceleration);
-        KICKER.resetTachoCount();
-        //KICKER.backward();
+//        KICKER.setAcceleration(acceleration);
+//        KICKER.setSpeed(MAXIMUM_MOTOR_SPEED);
         
-        KICKER.forward();
+//        KICKER.setPower(100);
+//        KICKERB.setPower(100);
+//        
+//        KICKER.forward();
+//        KICKERB.forward();
+        
+        byte forward = (byte)1;
+        byte backward = (byte)2;
+        byte off = (byte)0;
+        byte speed = (byte)255;
+        
+        MULTIPLEXER.setAddress(MUX_ADDRESS);
+        MULTIPLEXER.sendData(0x02,speed);
+        MULTIPLEXER.sendData(0x08,speed);
 
+        MULTIPLEXER.sendData(0x07,forward);
+        MULTIPLEXER.sendData(0x01,forward);
+
+        // TODO: Get the timings right.
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(80);
+                    Thread.sleep(160);
                 } catch (InterruptedException e) {
-                    //
+                    // TODO: Empty catch block
                 }
-                KICKER.rotateTo(0);
+//                KICKER.backward();
+//                KICKERB.backward();
+                MULTIPLEXER.sendData(0x01,(byte) 2);
+                MULTIPLEXER.sendData(0x07,(byte) 2);
+                try {
+                	Thread.sleep(160);
+                } catch (InterruptedException e) {
+                    // TODO: Empty catch block
+                }
+                MULTIPLEXER.sendData(0x01, (byte)0);
+                MULTIPLEXER.sendData(0x07, (byte)0);
+                
+                MULTIPLEXER.sendData(0x02, (byte)0);
+                MULTIPLEXER.sendData(0x08, (byte)0);
                 isKicking = false;
             }
         }).start();
     }
 
-    public void gentleKick(int speed, int angle) {
-        KICKER.setSpeed(speed);
-        KICKER.resetTachoCount();
-        KICKER.rotateTo(angle);
-        KICKER.rotateTo(0);
-    }
+//    public void gentleKick(int speed, int angle) {
+//        KICKER.setSpeed(speed);
+//        KICKER.resetTachoCount();
+//        KICKER.rotateTo(angle);
+//        KICKER.rotateTo(0);
+//    }
 
     public float getTravelDistance() {
         return pilot.getTravelDistance();
