@@ -212,9 +212,15 @@ public class SoftBot implements Controller {
 	public void kickRight() {}
 	
 	@Override
+	public void kickSides() {}
+	
+	@Override
 	public void dribblersOn() {}
 	
 	@Override
 	public void dribblersOff() {}
-
+	
+	@Override
+	public void playVerdi(){}
+	
 }

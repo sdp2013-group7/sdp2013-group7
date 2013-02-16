@@ -10,13 +10,7 @@ import lejos.nxt.Sound;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.comm.BTConnection;
 import lejos.nxt.comm.Bluetooth;
-import balle.bluetooth.messages.AbstractMessage;
-import balle.bluetooth.messages.MessageDecoder;
-import balle.bluetooth.messages.MessageKick;
-import balle.bluetooth.messages.MessageMove;
-import balle.bluetooth.messages.MessageRotate;
-import balle.bluetooth.messages.MessageStop;
-import balle.bluetooth.messages.MessageForward;
+import balle.bluetooth.messages.*;
 import balle.controller.Controller;
 
 class ListenerThread extends Thread {
@@ -109,6 +103,22 @@ public class Kraken {
         } else if (name.equals(MessageForward.NAME)) {
         	MessageForward messageForward = (MessageForward) decodedMessage;
         	controller.forward(messageForward.getArgument());
+        } else if (name.equals(MessageKickTentacle.NAME)) {
+        	int leftRightBoth = ((MessageKickTentacle) decodedMessage).getArgument();
+        	if (leftRightBoth == 0)
+        		controller.kickLeft();
+        	else if (leftRightBoth == 1)
+        		controller.kickRight();
+        	else
+        		controller.kickSides();
+        } else if (name.equals(MessageDribblers.NAME)) {
+        	int onOff = ((MessageDribblers) decodedMessage).getArgument();
+        	if (onOff == 0)
+        		controller.dribblersOff();
+        	else
+        		controller.dribblersOn();
+        } else if (name.equals(MessageVerdi.NAME)) {
+        	controller.playVerdi();
         } else {
             return false;
         }
@@ -188,7 +198,8 @@ public class Kraken {
                     AbstractMessage message = decoder
                             .decodeMessage(hashedMessage);
                     if (message == null) {
-                        drawMessage("Could not decode: " + hashedMessage);
+                        drawMessage("Could not decode: \n" + hashedMessage);
+                        Thread.sleep(10000);
                         break;
                     }
                     String name = message.getName();
@@ -196,8 +207,9 @@ public class Kraken {
 
                     boolean successful = processMessage(message, controller);
                     if (!successful) {
-                        drawMessage("Unknown message received: "
+                        drawMessage("Unknown message received: \n"
                                 + hashedMessage);
+                        Thread.sleep(10000);
                         break;
                     }
 

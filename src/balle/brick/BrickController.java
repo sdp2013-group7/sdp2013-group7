@@ -14,6 +14,9 @@ import lejos.nxt.I2CPort;
 import lejos.nxt.I2CSensor;
 import lejos.nxt.SensorPort;
 
+import lejos.nxt.Sound;
+import java.io.File;
+
 /**
  * The Control class. Handles the actual driving and movement of the bot, once
  * BotCommunication has processed the commands.
@@ -341,6 +344,11 @@ public class BrickController implements Controller {
 	}
 	
 	@Override
+	public void kickSides() {
+		// TODO: Method stub
+	}
+	
+	@Override
 	public void dribblersOn() {
 		// TODO: Dribblers will be MotorPort.A
 	}
@@ -348,6 +356,15 @@ public class BrickController implements Controller {
 	@Override
 	public void dribblersOff() {
 		// TODO: Dribblers will be MotorPort.A
+	}
+	
+	@Override
+	public void playVerdi() {
+        // Play Verdi's Requiem
+		if (Sound.getTime() == 0) {
+			File verdiFile = new File("verdi.wav");
+        	Sound.playSample(verdiFile, Sound.VOL_MAX);
+		}
 	}
 
 	

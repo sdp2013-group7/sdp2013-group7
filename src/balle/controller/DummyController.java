@@ -125,6 +125,11 @@ public class DummyController implements Controller {
 	}
 	
 	@Override
+	public void kickSides() {
+		System.out.println("Kick sides");
+	}
+	
+	@Override
 	public void dribblersOn() {
 		System.out.println("Dribblers on");
 	}
@@ -132,6 +137,11 @@ public class DummyController implements Controller {
 	@Override
 	public void dribblersOff() {
 		System.out.println("Dribblers off");
+	}
+	
+	@Override
+	public void playVerdi(){
+		System.out.println("Play Verdi's Requiem");
 	}
 
 }

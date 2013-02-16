@@ -3,13 +3,7 @@ package balle.controller;
 import java.util.ArrayList;
 
 import balle.bluetooth.Communicator;
-import balle.bluetooth.messages.InvalidArgumentException;
-import balle.bluetooth.messages.InvalidOpcodeException;
-import balle.bluetooth.messages.MessageKick;
-import balle.bluetooth.messages.MessageMove;
-import balle.bluetooth.messages.MessageRotate;
-import balle.bluetooth.messages.MessageStop;
-import balle.bluetooth.messages.MessageForward;
+import balle.bluetooth.messages.*;
 import balle.brick.BrickController;
 import balle.strategy.bezierNav.ControllerHistoryElement;
 
@@ -179,22 +173,74 @@ public class BluetoothController implements Controller {
 
 	@Override
 	public void kickLeft() {
-		// TODO: Bluetooth message for the left tentacle
+		try {
+            connection.send(new MessageKickTentacle(0).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message KICK LEFT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message KICK LEFT -- invalid argument");
+        }
 	}
 	
 	@Override
 	public void kickRight() {
-		// TODO: Bluetooth message for the right tentacle
+		try {
+            connection.send(new MessageKickTentacle(1).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message KICK RIGHT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message KICK RIGHT -- invalid argument");
+        }
 	}
 	
 	@Override
+	public void kickSides() {
+		try {
+            connection.send(new MessageKickTentacle(2).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message KICK SIDES -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message KICK SIDES -- invalid argument");
+        }
+	}	
+	
+	@Override
 	public void dribblersOn() {
-		// TODO: Bluetooth message for the dribblers
+		try {
+            connection.send(new MessageDribblers(1).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message DRIBBLERS ON -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message DRIBBLERS ON -- invalid argument");
+        }
 	}
 	
 	@Override
 	public void dribblersOff() {
-		// TODO: Bluetooth message for the dribblers
+		try {
+            connection.send(new MessageDribblers(0).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message DRIBBLERS OFF -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message DRIBBLERS OFF -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void playVerdi() {
+		try {
+            connection.send(new MessageVerdi().hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message PLAY VERDI -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message PLAY VERDI -- invalid argument");
+        }
 	}
 	
 /*	@Override

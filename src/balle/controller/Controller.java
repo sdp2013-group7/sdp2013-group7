@@ -82,6 +82,11 @@ public interface Controller {
     public abstract void kickRight();
     
     /**
+     * Kick with both tentacles
+     */
+    public abstract void kickSides();
+    
+    /**
      * Turn on the dribblers
      */
     public abstract void dribblersOn();
@@ -90,6 +95,11 @@ public interface Controller {
      * Turn off the dribblers
      */
     public abstract void dribblersOff();
+    
+    /**
+     * Play Verdi's Requiem
+     */
+    public abstract void playVerdi();
     
     //public abstract void gentleKick(int speed, int angle);
 
