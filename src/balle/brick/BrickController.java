@@ -3,7 +3,6 @@ package balle.brick;
 import balle.controller.Controller;
 import balle.controller.ControllerListener;
 import lejos.robotics.navigation.LegacyPilot;
-import lejos.nxt.BasicMotorPort;
 import lejos.nxt.Motor;
 import lejos.nxt.NXTRegulatedMotor;
 import lejos.nxt.LCD;
@@ -33,12 +32,9 @@ public class BrickController implements Controller {
                                     // for
                                     // friendlies
 
-    public final NXTRegulatedMotor LEFT_WHEEL = Motor.B;
-    public final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
-    public final RCXMotor DRIBBLER = new RCXMotor(MotorPort.A);
-    
-    public final I2CSensor MOTORMUX;
-    public final int MUX_ADDRESS = 0xB4;
+    private final NXTRegulatedMotor LEFT_WHEEL = Motor.B;
+    private final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
+    private final RCXMotor DRIBBLER = new RCXMotor(MotorPort.A);
 
     public final boolean INVERSE_WHEELS = true;
 
@@ -51,7 +47,22 @@ public class BrickController implements Controller {
     public static final float GEAR_ERROR_RATIO = (float) 5 / 3;
 
     private volatile boolean isKicking = false;
+    private volatile boolean isLeftKicking = false;
+    private volatile boolean isRightKicking = false;
+    private volatile boolean areSidesKicking = false;
+    private final int tentacleKickTime = 110;
 
+    // The mux and its address
+    // TODO: Make the mux volatile? Is it necessary?
+    private final I2CSensor MOTORMUX;
+    private final int MUX_ADDRESS = 0xB4;
+    
+    // Constants for the mux
+    private final byte kickSpeed = (byte)255;
+    private final byte forward = (byte) 1;
+    private final byte backward = (byte) 2;
+    private final byte off = (byte) 0;
+    
     public BrickController() {
 
     	I2CPort I2Cport = SensorPort.S4; //Assign port
@@ -71,20 +82,20 @@ public class BrickController implements Controller {
     	
     	MOTORMUX.setAddress(MUX_ADDRESS);
     	
-    	for( counter = 0; counter <65; counter ++){ 
-    		MOTORMUX.sendData(0x01 + (2*counter),direction);
-    		MOTORMUX.sendData(0x02 + (2*counter),speed);
-    	}
-    	try{
-    		Thread.sleep(1000);
-    	} catch (Exception e) {
-    		
-    	}
-    	for( counter = 0; counter <65; counter ++){ 
-    		MOTORMUX.sendData(0x02 + (2*counter),direction);
-    		MOTORMUX.sendData(0x01 + (2*counter),speed);
-    	}
-    	
+//    	for( counter = 0; counter <65; counter ++){ 
+//    		MOTORMUX.sendData(0x01 + (2*counter),direction);
+//    		MOTORMUX.sendData(0x02 + (2*counter),speed);
+//    	}
+//    	try{
+//    		Thread.sleep(1000);
+//    	} catch (Exception e) {
+//    		
+//    	}
+//    	for( counter = 0; counter <65; counter ++){ 
+//    		MOTORMUX.sendData(0x02 + (2*counter),direction);
+//    		MOTORMUX.sendData(0x01 + (2*counter),speed);
+//    	}
+//    	
     	drawMessage("Sweep done!");
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
@@ -138,26 +149,10 @@ public class BrickController implements Controller {
         }
 
         isKicking = true;
-
-//        int acceleration = 12000;
-
-//        KICKER.setAcceleration(acceleration);
-//        KICKER.setSpeed(MAXIMUM_MOTOR_SPEED);
-        
-//        KICKER.setPower(100);
-//        KICKERB.setPower(100);
-//        
-//        KICKER.forward();
-//        KICKERB.forward();
-        
-        byte forward = (byte)1;
-        byte backward = (byte)2;
-        byte off = (byte)0;
-        byte speed = (byte)255;
-        
+                
         MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(0x02,speed);
-        MOTORMUX.sendData(0x08,speed);
+        MOTORMUX.sendData(0x02,kickSpeed);
+        MOTORMUX.sendData(0x08,kickSpeed);
 
         MOTORMUX.sendData(0x07,forward);
         MOTORMUX.sendData(0x01,forward);
@@ -168,24 +163,21 @@ public class BrickController implements Controller {
             public void run() {
                 try {
                     Thread.sleep(160);
+                    
+                    MOTORMUX.sendData(0x01, backward);
+                    MOTORMUX.sendData(0x07, backward);
+                    
+                    Thread.sleep(160);
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
-                }
-//                KICKER.backward();
-//                KICKERB.backward();
-                MOTORMUX.sendData(0x01,(byte) 2);
-                MOTORMUX.sendData(0x07,(byte) 2);
-                try {
-                	Thread.sleep(160);
-                } catch (InterruptedException e) {
-                    // TODO: Empty catch block
-                }
-                MOTORMUX.sendData(0x01, (byte)0);
-                MOTORMUX.sendData(0x07, (byte)0);
+                } finally {
+                	MOTORMUX.sendData(0x01, off);
+                	MOTORMUX.sendData(0x07, off);
                 
-                MOTORMUX.sendData(0x02, (byte)0);
-                MOTORMUX.sendData(0x08, (byte)0);
-                isKicking = false;
+                	MOTORMUX.sendData(0x02, off);
+                	MOTORMUX.sendData(0x08, off);
+                	isKicking = false;
+                }
             }
         }).start();
     }
@@ -333,17 +325,114 @@ public class BrickController implements Controller {
 	
 	@Override
 	public void kickLeft() {
-		// TODO: Finish coding the motor multiplexer
+		// TODO: Make it stay out?
+		if (isLeftKicking || areSidesKicking)
+			return;
+		
+		isLeftKicking = true;
+		
+		// Port 3 on mux
+        MOTORMUX.setAddress(MUX_ADDRESS);
+        MOTORMUX.sendData(0x06,kickSpeed);
+        MOTORMUX.sendData(0x05,forward);
+
+        // TODO: Get the timings right.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(tentacleKickTime);
+                    
+                    MOTORMUX.sendData(0x05, off);
+
+                    Thread.sleep(2000);
+                    
+                    MOTORMUX.sendData(0x05, backward);
+
+                	Thread.sleep(tentacleKickTime - 10);
+                } catch (InterruptedException e) {
+                    // TODO: Empty catch block
+                } finally {
+                	MOTORMUX.sendData(0x05, off);
+                	MOTORMUX.sendData(0x06, off);
+                	isLeftKicking = false;
+                }
+            }
+        }).start();
+		
 	}
 	
 	@Override
 	public void kickRight() {
-		// TODO: Finish coding the motor multiplexer
+		// TODO: Make it stay out?
+		if (isRightKicking || areSidesKicking)
+			return;
+		
+		// Port 2 on mux
+		isRightKicking = true;
+		
+        MOTORMUX.setAddress(MUX_ADDRESS);
+        MOTORMUX.sendData(0x04,kickSpeed);
+        MOTORMUX.sendData(0x03,forward);
+
+        // TODO: Get the timings right.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(tentacleKickTime);
+                    
+                    MOTORMUX.sendData(0x03,backward);
+                    
+                    Thread.sleep(tentacleKickTime);
+                                       
+                } catch (InterruptedException e) {
+                    // TODO: Empty catch block
+                } finally {
+                    MOTORMUX.sendData(0x03, off);
+                    MOTORMUX.sendData(0x04, off);
+                    isRightKicking = false;
+                }                
+            }
+        }).start();
 	}
 	
 	@Override
 	public void kickSides() {
-		// TODO: Method stub
+		// TODO: Make them stay out?
+		if (isLeftKicking || isRightKicking || areSidesKicking)
+			return;
+		
+		areSidesKicking = true;
+        
+        MOTORMUX.setAddress(MUX_ADDRESS);
+        MOTORMUX.sendData(0x04,kickSpeed);
+        MOTORMUX.sendData(0x06,kickSpeed);
+        MOTORMUX.sendData(0x05,forward);
+        MOTORMUX.sendData(0x03,forward);
+
+        // TODO: Get the timings right.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(tentacleKickTime);
+                    
+                    MOTORMUX.sendData(0x03,backward);
+                    MOTORMUX.sendData(0x05,backward);
+                    
+                    Thread.sleep(tentacleKickTime);
+                } catch (InterruptedException e) {
+                    // TODO: Empty catch block
+                } finally {
+                    MOTORMUX.sendData(0x03, off);
+                    MOTORMUX.sendData(0x05, off);
+                    MOTORMUX.sendData(0x04, off);
+                    MOTORMUX.sendData(0x06, off);
+                    areSidesKicking = false;
+                }                               
+            }
+        }).start();
 	}
 	
 	@Override
