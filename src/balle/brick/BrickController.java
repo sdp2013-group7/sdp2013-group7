@@ -50,7 +50,8 @@ public class BrickController implements Controller {
     private volatile boolean isLeftKicking = false;
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
-    private final int tentacleKickTime = 110;
+    private final int tentacleKickTime = 40;
+    private final int mainKickTime = 160;
 
     // The mux and its address
     // TODO: Make the mux volatile? Is it necessary?
@@ -62,6 +63,16 @@ public class BrickController implements Controller {
     private final byte forward = (byte) 1;
     private final byte backward = (byte) 2;
     private final byte off = (byte) 0;
+    
+    // Constants for the mux registers
+    private final int kicker1Direction = 0x01;
+    private final int kicker1Speed = 0x02;
+    private final int tentacleRightDirection = 0x03;
+    private final int tentacleRightSpeed = 0x04;
+    private final int tentacleLeftDirection = 0x05;
+    private final int tentacleLeftSpeed = 0x06;
+    private final int kicker2Direction = 0x07;
+    private final int kicker2Speed = 0x08;
     
     public BrickController() {
 
@@ -151,31 +162,31 @@ public class BrickController implements Controller {
         isKicking = true;
                 
         MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(0x02,kickSpeed);
-        MOTORMUX.sendData(0x08,kickSpeed);
+        MOTORMUX.sendData(kicker1Speed,kickSpeed);
+        MOTORMUX.sendData(kicker2Speed,kickSpeed);
 
-        MOTORMUX.sendData(0x07,forward);
-        MOTORMUX.sendData(0x01,forward);
+        MOTORMUX.sendData(kicker1Direction,forward);
+        MOTORMUX.sendData(kicker2Direction,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(160);
+                    Thread.sleep(mainKickTime);
                     
-                    MOTORMUX.sendData(0x01, backward);
-                    MOTORMUX.sendData(0x07, backward);
+                    MOTORMUX.sendData(kicker1Direction, backward);
+                    MOTORMUX.sendData(kicker2Direction, backward);
                     
-                    Thread.sleep(160);
+                    Thread.sleep(mainKickTime);
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
                 } finally {
-                	MOTORMUX.sendData(0x01, off);
-                	MOTORMUX.sendData(0x07, off);
+                	MOTORMUX.sendData(kicker1Direction, off);
+                	MOTORMUX.sendData(kicker2Direction, off);
                 
-                	MOTORMUX.sendData(0x02, off);
-                	MOTORMUX.sendData(0x08, off);
+                	MOTORMUX.sendData(kicker1Speed, off);
+                	MOTORMUX.sendData(kicker2Speed, off);
                 	isKicking = false;
                 }
             }
@@ -333,8 +344,8 @@ public class BrickController implements Controller {
 		
 		// Port 3 on mux
         MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(0x06,kickSpeed);
-        MOTORMUX.sendData(0x05,forward);
+        MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+        MOTORMUX.sendData(tentacleLeftDirection,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
@@ -343,18 +354,18 @@ public class BrickController implements Controller {
                 try {
                     Thread.sleep(tentacleKickTime);
                     
-                    MOTORMUX.sendData(0x05, off);
+                    MOTORMUX.sendData(tentacleLeftDirection, off);
 
                     Thread.sleep(2000);
                     
-                    MOTORMUX.sendData(0x05, backward);
+                    MOTORMUX.sendData(tentacleLeftDirection, backward);
 
                 	Thread.sleep(tentacleKickTime - 10);
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
                 } finally {
-                	MOTORMUX.sendData(0x05, off);
-                	MOTORMUX.sendData(0x06, off);
+                	MOTORMUX.sendData(tentacleLeftDirection, off);
+                	MOTORMUX.sendData(tentacleLeftSpeed, off);
                 	isLeftKicking = false;
                 }
             }
@@ -372,8 +383,8 @@ public class BrickController implements Controller {
 		isRightKicking = true;
 		
         MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(0x04,kickSpeed);
-        MOTORMUX.sendData(0x03,forward);
+        MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+        MOTORMUX.sendData(tentacleRightDirection,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
@@ -382,15 +393,15 @@ public class BrickController implements Controller {
                 try {
                     Thread.sleep(tentacleKickTime);
                     
-                    MOTORMUX.sendData(0x03,backward);
+                    MOTORMUX.sendData(tentacleRightDirection,backward);
                     
                     Thread.sleep(tentacleKickTime);
                                        
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
                 } finally {
-                    MOTORMUX.sendData(0x03, off);
-                    MOTORMUX.sendData(0x04, off);
+                    MOTORMUX.sendData(tentacleRightDirection, off);
+                    MOTORMUX.sendData(tentacleRightSpeed, off);
                     isRightKicking = false;
                 }                
             }
@@ -406,10 +417,10 @@ public class BrickController implements Controller {
 		areSidesKicking = true;
         
         MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(0x04,kickSpeed);
-        MOTORMUX.sendData(0x06,kickSpeed);
-        MOTORMUX.sendData(0x05,forward);
-        MOTORMUX.sendData(0x03,forward);
+        MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+        MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+        MOTORMUX.sendData(tentacleLeftDirection,forward);
+        MOTORMUX.sendData(tentacleRightDirection,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
@@ -418,17 +429,17 @@ public class BrickController implements Controller {
                 try {
                     Thread.sleep(tentacleKickTime);
                     
-                    MOTORMUX.sendData(0x03,backward);
-                    MOTORMUX.sendData(0x05,backward);
+                    MOTORMUX.sendData(tentacleRightDirection,backward);
+                    MOTORMUX.sendData(tentacleLeftDirection,backward);
                     
                     Thread.sleep(tentacleKickTime);
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
                 } finally {
-                    MOTORMUX.sendData(0x03, off);
-                    MOTORMUX.sendData(0x05, off);
-                    MOTORMUX.sendData(0x04, off);
-                    MOTORMUX.sendData(0x06, off);
+                    MOTORMUX.sendData(tentacleRightDirection, off);
+                    MOTORMUX.sendData(tentacleLeftDirection, off);
+                    MOTORMUX.sendData(tentacleRightSpeed, off);
+                    MOTORMUX.sendData(tentacleLeftSpeed, off);
                     areSidesKicking = false;
                 }                               
             }
