@@ -35,11 +35,9 @@ public class BrickController implements Controller {
 
     public final NXTRegulatedMotor LEFT_WHEEL = Motor.B;
     public final NXTRegulatedMotor RIGHT_WHEEL = Motor.C;
-//    public final NXTRegulatedMotor KICKER = Motor.A;
-//    public final RCXMotor KICKER = new RCXMotor(MotorPort.A);
-//    public final RCXMotor KICKERB = new RCXMotor(MotorPort.B);
+    public final RCXMotor DRIBBLER = new RCXMotor(MotorPort.A);
     
-    public final I2CSensor MULTIPLEXER;
+    public final I2CSensor MOTORMUX;
     public final int MUX_ADDRESS = 0xB4;
 
     public final boolean INVERSE_WHEELS = true;
@@ -49,8 +47,8 @@ public class BrickController implements Controller {
 
     public static final int MAXIMUM_MOTOR_SPEED = 2000;
 
-    // TODO: Fix the ratio, make sure it's >= 1, otherwise will divide by 0
-    public static final float GEAR_ERROR_RATIO = (float) 5 / 3; // Gears cut our turns in half
+    // Our gear ratio is 5/3
+    public static final float GEAR_ERROR_RATIO = (float) 5 / 3;
 
     private volatile boolean isKicking = false;
 
@@ -59,7 +57,7 @@ public class BrickController implements Controller {
     	I2CPort I2Cport = SensorPort.S4; //Assign port
     	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
     	
-    	MULTIPLEXER = new I2CSensor(I2Cport);
+    	MOTORMUX = new I2CSensor(I2Cport);
     	
     	// Register sweep
     	// Sometimes refuses to work otherwise, documents say
@@ -71,11 +69,11 @@ public class BrickController implements Controller {
     	byte direction = (byte) 1;
     	byte speed = (byte)200;
     	
-    	MULTIPLEXER.setAddress(MUX_ADDRESS);
+    	MOTORMUX.setAddress(MUX_ADDRESS);
     	
     	for( counter = 0; counter <65; counter ++){ 
-    		MULTIPLEXER.sendData(0x01 + (2*counter),direction);
-    		MULTIPLEXER.sendData(0x02 + (2*counter),speed);
+    		MOTORMUX.sendData(0x01 + (2*counter),direction);
+    		MOTORMUX.sendData(0x02 + (2*counter),speed);
     	}
     	try{
     		Thread.sleep(1000);
@@ -83,8 +81,8 @@ public class BrickController implements Controller {
     		
     	}
     	for( counter = 0; counter <65; counter ++){ 
-    		MULTIPLEXER.sendData(0x02 + (2*counter),direction);
-    		MULTIPLEXER.sendData(0x01 + (2*counter),speed);
+    		MOTORMUX.sendData(0x02 + (2*counter),direction);
+    		MOTORMUX.sendData(0x01 + (2*counter),speed);
     	}
     	
     	drawMessage("Sweep done!");
@@ -157,12 +155,12 @@ public class BrickController implements Controller {
         byte off = (byte)0;
         byte speed = (byte)255;
         
-        MULTIPLEXER.setAddress(MUX_ADDRESS);
-        MULTIPLEXER.sendData(0x02,speed);
-        MULTIPLEXER.sendData(0x08,speed);
+        MOTORMUX.setAddress(MUX_ADDRESS);
+        MOTORMUX.sendData(0x02,speed);
+        MOTORMUX.sendData(0x08,speed);
 
-        MULTIPLEXER.sendData(0x07,forward);
-        MULTIPLEXER.sendData(0x01,forward);
+        MOTORMUX.sendData(0x07,forward);
+        MOTORMUX.sendData(0x01,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
@@ -175,18 +173,18 @@ public class BrickController implements Controller {
                 }
 //                KICKER.backward();
 //                KICKERB.backward();
-                MULTIPLEXER.sendData(0x01,(byte) 2);
-                MULTIPLEXER.sendData(0x07,(byte) 2);
+                MOTORMUX.sendData(0x01,(byte) 2);
+                MOTORMUX.sendData(0x07,(byte) 2);
                 try {
                 	Thread.sleep(160);
                 } catch (InterruptedException e) {
                     // TODO: Empty catch block
                 }
-                MULTIPLEXER.sendData(0x01, (byte)0);
-                MULTIPLEXER.sendData(0x07, (byte)0);
+                MOTORMUX.sendData(0x01, (byte)0);
+                MOTORMUX.sendData(0x07, (byte)0);
                 
-                MULTIPLEXER.sendData(0x02, (byte)0);
-                MULTIPLEXER.sendData(0x08, (byte)0);
+                MOTORMUX.sendData(0x02, (byte)0);
+                MOTORMUX.sendData(0x08, (byte)0);
                 isKicking = false;
             }
         }).start();
@@ -350,12 +348,13 @@ public class BrickController implements Controller {
 	
 	@Override
 	public void dribblersOn() {
-		// TODO: Dribblers will be MotorPort.A
+		DRIBBLER.setPower(100);
+		DRIBBLER.backward();
 	}
 	
 	@Override
 	public void dribblersOff() {
-		// TODO: Dribblers will be MotorPort.A
+		DRIBBLER.stop();
 	}
 	
 	@Override
