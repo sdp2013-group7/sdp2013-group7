@@ -91,6 +91,18 @@ public class Run {
             	    controller.setWheelSpeeds(speed1, speed2);
             	} else if (command.equals("penaltyKick")) {
             	    controller.penaltyKick();
+            	} else if (command.equals("verdi")) {
+            		controller.playVerdi();
+            	} else if (command.equals("dribbleOff")) {
+            		controller.dribblersOff();
+            	} else if (command.equals("dribbleOn")) {
+            		controller.dribblersOn();
+            	} else if (command.equals("kickl")) {
+            		controller.kickLeft();
+            	} else if (command.equals("kickr")) {
+            		controller.kickRight();
+            	} else if (command.equals("kicks")) {
+            		controller.kickSides();
             	} else if (command.equals("quit")) {
             	    break;
             	}
