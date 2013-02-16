@@ -177,6 +177,26 @@ public class BluetoothController implements Controller {
 			cl.commandSent(che);
 	}
 
+	@Override
+	public void kickLeft() {
+		// TODO: Bluetooth message for the left tentacle
+	}
+	
+	@Override
+	public void kickRight() {
+		// TODO: Bluetooth message for the right tentacle
+	}
+	
+	@Override
+	public void dribblersOn() {
+		// TODO: Bluetooth message for the dribblers
+	}
+	
+	@Override
+	public void dribblersOff() {
+		// TODO: Bluetooth message for the dribblers
+	}
+	
 /*	@Override
 	public void gentleKick(int speed, int angle) {
 		// TODO Auto-generated method stub

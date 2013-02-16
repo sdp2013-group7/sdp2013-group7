@@ -199,5 +199,22 @@ public class SoftBot implements Controller {
 		for (ControllerListener cl : listeners)
 			cl.commandSent(che);
 	}
+	
+	/*
+	 * Dummy methods for the tentacles and dribblers
+	 * to implement the Controller interface.
+	 * Currently unsupported by the simulator
+	 */
+	@Override
+	public void kickLeft() {}
+	
+	@Override
+	public void kickRight() {}
+	
+	@Override
+	public void dribblersOn() {}
+	
+	@Override
+	public void dribblersOff() {}
 
 }

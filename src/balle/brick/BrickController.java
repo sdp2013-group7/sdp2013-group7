@@ -330,6 +330,27 @@ public class BrickController implements Controller {
 		// TODO make STUB
 	}
 	
+	@Override
+	public void kickLeft() {
+		// TODO: Finish coding the motor multiplexer
+	}
+	
+	@Override
+	public void kickRight() {
+		// TODO: Finish coding the motor multiplexer
+	}
+	
+	@Override
+	public void dribblersOn() {
+		// TODO: Dribblers will be MotorPort.A
+	}
+	
+	@Override
+	public void dribblersOff() {
+		// TODO: Dribblers will be MotorPort.A
+	}
+
+	
 	private static void drawMessage(String message) {
         LCD.clear();
         LCD.drawString(message, 0, 0);

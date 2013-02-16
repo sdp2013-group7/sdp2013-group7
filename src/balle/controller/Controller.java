@@ -71,6 +71,26 @@ public interface Controller {
      */
     public abstract void penaltyKick();
     
+    /**
+     * 	Kick with the left tentacle
+     */
+    public abstract void kickLeft();
+    
+    /**
+     * Kick with the right tentacle
+     */
+    public abstract void kickRight();
+    
+    /**
+     * Turn on the dribblers
+     */
+    public abstract void dribblersOn();
+    
+    /**
+     * Turn off the dribblers
+     */
+    public abstract void dribblersOff();
+    
     //public abstract void gentleKick(int speed, int angle);
 
 	public abstract void addListener(ControllerListener cl);

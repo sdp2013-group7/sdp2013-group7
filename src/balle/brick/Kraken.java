@@ -84,6 +84,7 @@ public class Kraken {
             Controller controller) {
         String name = decodedMessage.getName();
 
+        // TODO: Decoding the messages for the dribblers and tentacles
         if (name.equals(MessageKick.NAME)) {
             MessageKick messageKick = (MessageKick) decodedMessage;
             if (messageKick.isPenalty()) {

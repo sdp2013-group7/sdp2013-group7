@@ -114,4 +114,24 @@ public class DummyController implements Controller {
 		
 	}*/
 
+	@Override
+	public void kickLeft() {
+		System.out.println("Left kick");
+	}
+	
+	@Override
+	public void kickRight() {
+		System.out.println("Right kick");
+	}
+	
+	@Override
+	public void dribblersOn() {
+		System.out.println("Dribblers on");
+	}
+	
+	@Override
+	public void dribblersOff() {
+		System.out.println("Dribblers off");
+	}
+
 }
