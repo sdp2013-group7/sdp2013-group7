@@ -38,6 +38,14 @@ public class MessageDecoder {
             case MessageForward.OPCODE:
             	int speed = MessageForward.decodeArgumentsFromHash(hashedMessage);
             	return new MessageForward(speed);
+            case MessageKickTentacle.OPCODE:
+            	int leftRightBoth = MessageKickTentacle.decodeArgumentsFromHash(hashedMessage);
+            	return new MessageKickTentacle(leftRightBoth);
+            case MessageDribblers.OPCODE:
+            	int onOff = MessageDribblers.decodeArgumentsFromHash(hashedMessage);
+            	return new MessageDribblers(onOff);
+            case MessageVerdi.OPCODE:
+            	return new MessageVerdi();
             default:
                 // Unknown type
                 return null;
