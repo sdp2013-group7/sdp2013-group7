@@ -10,7 +10,7 @@ public class MultiplexerTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		// TODO Auto-generated method stub
 		I2CSensor MULTIPLEXER;
 		
@@ -44,15 +44,11 @@ public class MultiplexerTest {
 //    	
     	
     	int res1 = MULTIPLEXER.sendData(0x01,direction);
-    	drawMessage(Integer.toString(res1));
     	int res2 = MULTIPLEXER.sendData(0x02,speed);
-    	drawMessage(Integer.toString(res2));
+    	drawMessage(Integer.toString(res1) +"\n" + Integer.toString(res2));
     	
-    	try {
-    		Thread.sleep(5000);
-    	} catch (Exception e) {
+    	Thread.sleep(5000);
     		
-    	}
     	MULTIPLEXER.sendData(0x01,(byte)0);
     	MULTIPLEXER.sendData(0x02,(byte)0);
     	
