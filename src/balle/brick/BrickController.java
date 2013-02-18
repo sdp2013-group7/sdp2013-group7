@@ -51,7 +51,7 @@ public class BrickController implements Controller {
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
     private final int tentacleKickTime = 40;
-    private final int mainKickTime = 160;
+    private final int mainKickTime = 100;
 
     // The mux and its address
     // TODO: Make the mux volatile? Is it necessary?
@@ -74,56 +74,62 @@ public class BrickController implements Controller {
     private final int kicker2Direction = 0x07;
     private final int kicker2Speed = 0x08;
     
-    public BrickController() {
+    @SuppressWarnings("deprecation")
+	public BrickController() {
 
     	I2CPort I2Cport = SensorPort.S4; //Assign port
     	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
     	
     	MOTORMUX = new I2CSensor(I2Cport);
+    	MOTORMUX.setAddress(MUX_ADDRESS);
     	
     	// Register sweep
     	// Sometimes refuses to work otherwise, documents say
-    	// the reason for this is unknown
+    	// the reason for this is unknown    	
     	
-    	drawMessage("Start sweep");
-    	
-    	int counter;
-    	byte direction = (byte) 1;
-    	byte speed = (byte)200;
-    	
-    	MOTORMUX.setAddress(MUX_ADDRESS);
-    	
-//    	for( counter = 0; counter <65; counter ++){ 
-//    		MOTORMUX.sendData(0x01 + (2*counter),direction);
-//    		MOTORMUX.sendData(0x02 + (2*counter),speed);
-//    	}
-//    	try{
-//    		Thread.sleep(1000);
-//    	} catch (Exception e) {
-//    		
-//    	}
-//    	for( counter = 0; counter <65; counter ++){ 
-//    		MOTORMUX.sendData(0x02 + (2*counter),direction);
-//    		MOTORMUX.sendData(0x01 + (2*counter),speed);
-//    	}
-//    	
-    	drawMessage("Sweep done!");
+//    	registerSweep();
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
                 RIGHT_WHEEL, INVERSE_WHEELS);
         pilot.setMoveSpeed(maxPilotSpeed);
         pilot.setTurnSpeed(45); // 45 has been working fine.
+        
         // TODO: Check the acceleration values with the robot when it's done
 //        LEFT_WHEEL.setAcceleration(250);
 //        RIGHT_WHEEL.setAcceleration(250);
-        //pilot.regulateSpeed(true);
-        //LEFT_WHEEL.regulateSpeed(true);
-        //RIGHT_WHEEL.regulateSpeed(true);
-        //LEFT_WHEEL.smoothAcceleration(true);
-        //RIGHT_WHEEL.smoothAcceleration(true);
-        //KICKER.smoothAcceleration(false);
-        //KICKER.regulateSpeed(false);
+//        pilot.regulateSpeed(true);
+//        LEFT_WHEEL.regulateSpeed(true);
+//        RIGHT_WHEEL.regulateSpeed(true);
+//        LEFT_WHEEL.smoothAcceleration(true);
+//        RIGHT_WHEEL.smoothAcceleration(true);
+//        KICKER.smoothAcceleration(false);
+//        KICKER.regulateSpeed(false);
 
+    }
+    
+    @SuppressWarnings("deprecation")
+	void registerSweep() {
+    	drawMessage("Start sweep");
+
+    	int counter;
+    	byte direction = (byte) 1;
+    	byte speed = (byte)200;
+    	    	
+    	for( counter = 0; counter <65; counter ++){ 
+    		MOTORMUX.sendData(0x01 + (2*counter),direction);
+    		MOTORMUX.sendData(0x02 + (2*counter),speed);
+    	}
+    	try{
+    		Thread.sleep(1000);
+    	} catch (Exception e) {
+    		
+    	}
+    	for( counter = 0; counter <65; counter ++){ 
+    		MOTORMUX.sendData(0x02 + (2*counter),direction);
+    		MOTORMUX.sendData(0x01 + (2*counter),speed);
+    	}
+    	
+    	drawMessage("Sweep done!");
     }
 
     /*
@@ -142,7 +148,8 @@ public class BrickController implements Controller {
      * 
      * @see balle.brick.Controller#stop()
      */
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void stop() {
         pilot.stop();
     }
@@ -152,7 +159,8 @@ public class BrickController implements Controller {
      * 
      * @see balle.brick.Controller#kick()
      */
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void kick() {
 
         if (isKicking) {
@@ -160,27 +168,25 @@ public class BrickController implements Controller {
         }
 
         isKicking = true;
-                
-        MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(kicker1Speed,kickSpeed);
-        MOTORMUX.sendData(kicker2Speed,kickSpeed);
-
-        MOTORMUX.sendData(kicker1Direction,forward);
-        MOTORMUX.sendData(kicker2Direction,forward);
-
-        // TODO: Get the timings right.
+        
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    MOTORMUX.sendData(kicker1Speed,kickSpeed);
+                    MOTORMUX.sendData(kicker2Speed,kickSpeed);
+
+                    MOTORMUX.sendData(kicker1Direction,forward);
+                    MOTORMUX.sendData(kicker2Direction,forward);
+                	
                     Thread.sleep(mainKickTime);
                     
                     MOTORMUX.sendData(kicker1Direction, backward);
                     MOTORMUX.sendData(kicker2Direction, backward);
                     
-                    Thread.sleep(mainKickTime);
+                    Thread.sleep(mainKickTime - 25);
                 } catch (InterruptedException e) {
-                    // TODO: Empty catch block
+                    drawMessage("InterruptedException\nin kick");
                 } finally {
                 	MOTORMUX.sendData(kicker1Direction, off);
                 	MOTORMUX.sendData(kicker2Direction, off);
@@ -200,11 +206,13 @@ public class BrickController implements Controller {
 //        KICKER.rotateTo(0);
 //    }
 
-    public float getTravelDistance() {
+    @SuppressWarnings("deprecation")
+	public float getTravelDistance() {
         return pilot.getTravelDistance();
     }
 
-    public void reset() {
+    @SuppressWarnings("deprecation")
+	public void reset() {
         pilot.reset();
     }
 
@@ -250,14 +258,16 @@ public class BrickController implements Controller {
     }
 
     // Not used at the moment, setWheelSpeeds gets called instead
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void backward(int speed) {
         pilot.setMoveSpeed(speed);
         pilot.backward();
     }
 
     // Not used at the moment, setWheelSpeeds gets called instead
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void forward(int speed) {
         pilot.setMoveSpeed(speed);
         pilot.forward();
@@ -308,7 +318,8 @@ public class BrickController implements Controller {
 
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void rotate(int deg, int speed) {
         pilot.setTurnSpeed(speed);
         pilot.rotate(deg / GEAR_ERROR_RATIO);
@@ -334,24 +345,24 @@ public class BrickController implements Controller {
 		// TODO make STUB
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void kickLeft() {
 		// TODO: Make it stay out?
 		if (isLeftKicking || areSidesKicking)
 			return;
 		
-		isLeftKicking = true;
-		
 		// Port 3 on mux
-        MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
-        MOTORMUX.sendData(tentacleLeftDirection,forward);
+		isLeftKicking = true;		
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+                    MOTORMUX.sendData(tentacleLeftDirection,forward);
+                    
                     Thread.sleep(tentacleKickTime);
                     
                     MOTORMUX.sendData(tentacleLeftDirection, off);
@@ -362,7 +373,7 @@ public class BrickController implements Controller {
 
                 	Thread.sleep(tentacleKickTime - 10);
                 } catch (InterruptedException e) {
-                    // TODO: Empty catch block
+                    drawMessage("InterruptedException\nin kickLeft");
                 } finally {
                 	MOTORMUX.sendData(tentacleLeftDirection, off);
                 	MOTORMUX.sendData(tentacleLeftSpeed, off);
@@ -373,6 +384,7 @@ public class BrickController implements Controller {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void kickRight() {
 		// TODO: Make it stay out?
@@ -381,24 +393,22 @@ public class BrickController implements Controller {
 		
 		// Port 2 on mux
 		isRightKicking = true;
-		
-        MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
-        MOTORMUX.sendData(tentacleRightDirection,forward);
 
         // TODO: Get the timings right.
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+                    MOTORMUX.sendData(tentacleRightDirection,forward);
+                    
                     Thread.sleep(tentacleKickTime);
                     
                     MOTORMUX.sendData(tentacleRightDirection,backward);
                     
-                    Thread.sleep(tentacleKickTime);
-                                       
+                    Thread.sleep(tentacleKickTime);                                       
                 } catch (InterruptedException e) {
-                    // TODO: Empty catch block
+                    drawMessage("InterruptedException\nin kickRight");
                 } finally {
                     MOTORMUX.sendData(tentacleRightDirection, off);
                     MOTORMUX.sendData(tentacleRightSpeed, off);
@@ -408,6 +418,7 @@ public class BrickController implements Controller {
         }).start();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void kickSides() {
 		// TODO: Make them stay out?
@@ -415,18 +426,17 @@ public class BrickController implements Controller {
 			return;
 		
 		areSidesKicking = true;
-        
-        MOTORMUX.setAddress(MUX_ADDRESS);
-        MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
-        MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
-        MOTORMUX.sendData(tentacleLeftDirection,forward);
-        MOTORMUX.sendData(tentacleRightDirection,forward);
-
+		
         // TODO: Get the timings right.
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+                    MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+                    MOTORMUX.sendData(tentacleLeftDirection,forward);
+                    MOTORMUX.sendData(tentacleRightDirection,forward);
+                	
                     Thread.sleep(tentacleKickTime);
                     
                     MOTORMUX.sendData(tentacleRightDirection,backward);
@@ -434,7 +444,7 @@ public class BrickController implements Controller {
                     
                     Thread.sleep(tentacleKickTime);
                 } catch (InterruptedException e) {
-                    // TODO: Empty catch block
+                    drawMessage("InterruptedException\nin kickSides");
                 } finally {
                     MOTORMUX.sendData(tentacleRightDirection, off);
                     MOTORMUX.sendData(tentacleLeftDirection, off);
