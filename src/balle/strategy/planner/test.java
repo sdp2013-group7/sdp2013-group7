@@ -30,7 +30,7 @@ public class test extends AbstractPlanner {
 	public test() {
 
 		// initialise strategies that will be used in milestone2
-		goToBallSafeStrategy = new gotoball();
+		goToBallSafeStrategy = new GoToBall2();
 	}
 
 	// method to stop strategies that would not usually stop themselves

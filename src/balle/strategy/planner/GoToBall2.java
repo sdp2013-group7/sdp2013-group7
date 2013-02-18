@@ -25,15 +25,15 @@ import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.Robot;
 
-public class gotoball extends GoToBall {
+public class GoToBall2 extends GoToBall {
     private static final double BALL_SPEED_THRESHOLD = 0.01 / 1000; // m/ms
     private static final double BALL_SAFE_GAP = 0.4;
     private static final double ANGLE_THRESHOLD = Math.PI / 2;
     private final RotateToOrientationExecutor turnExecutor;
 
-    private static Logger LOG = Logger.getLogger(gotoball.class);
+    private static Logger LOG = Logger.getLogger(GoToBall2.class);
 
-    public gotoball() {
+    public GoToBall2() {
         super(new GoToObjectPFN(0), true);
         turnExecutor = new FaceAngle(ANGLE_THRESHOLD);
         setExecutorStrategy(new GoToObjectPFN(0));
@@ -185,8 +185,8 @@ public class gotoball extends GoToBall {
     }
 
     @FactoryMethod(designator = "gotoball", parameterNames = {})
-    public static gotoball factoryMethod() {
-        return new gotoball();
+    public static GoToBall2 factoryMethod() {
+        return new GoToBall2();
     }
 
 }
