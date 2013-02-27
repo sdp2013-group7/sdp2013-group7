@@ -26,6 +26,7 @@ import java.io.File;
  * 
  * @author sauliusl
  */
+@SuppressWarnings("deprecation")
 public class BrickController implements Controller {
 	LegacyPilot pilot;
     public int maxPilotSpeed = 600; // 20
@@ -50,8 +51,8 @@ public class BrickController implements Controller {
     private volatile boolean isLeftKicking = false;
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
-    private final int tentacleKickTime = 40;
-    private final int mainKickTime = 100;
+    private final int tentacleKickTime = 100;
+    private final int mainKickTime = 120;
 
     // The mux and its address
     // TODO: Make the mux volatile? Is it necessary?
@@ -74,8 +75,7 @@ public class BrickController implements Controller {
     private final int kicker2Direction = 0x07;
     private final int kicker2Speed = 0x08;
     
-    @SuppressWarnings("deprecation")
-	public BrickController() {
+    public BrickController() {
 
     	I2CPort I2Cport = SensorPort.S4; //Assign port
     	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
@@ -107,8 +107,7 @@ public class BrickController implements Controller {
 
     }
     
-    @SuppressWarnings("deprecation")
-	void registerSweep() {
+    void registerSweep() {
     	drawMessage("Start sweep");
 
     	int counter;
@@ -148,8 +147,7 @@ public class BrickController implements Controller {
      * 
      * @see balle.brick.Controller#stop()
      */
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void stop() {
         pilot.stop();
     }
@@ -159,8 +157,7 @@ public class BrickController implements Controller {
      * 
      * @see balle.brick.Controller#kick()
      */
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void kick() {
 
         if (isKicking) {
@@ -176,15 +173,15 @@ public class BrickController implements Controller {
                     MOTORMUX.sendData(kicker1Speed,kickSpeed);
                     MOTORMUX.sendData(kicker2Speed,kickSpeed);
 
-                    MOTORMUX.sendData(kicker1Direction,forward);
-                    MOTORMUX.sendData(kicker2Direction,forward);
+                    MOTORMUX.sendData(kicker1Direction,backward);
+                    MOTORMUX.sendData(kicker2Direction,backward);
                 	
                     Thread.sleep(mainKickTime);
                     
-                    MOTORMUX.sendData(kicker1Direction, backward);
-                    MOTORMUX.sendData(kicker2Direction, backward);
+                    MOTORMUX.sendData(kicker1Direction, forward);
+                    MOTORMUX.sendData(kicker2Direction, forward);
                     
-                    Thread.sleep(mainKickTime - 25);
+                    Thread.sleep(mainKickTime - 80);
                 } catch (InterruptedException e) {
                     drawMessage("InterruptedException\nin kick");
                 } finally {
@@ -206,13 +203,11 @@ public class BrickController implements Controller {
 //        KICKER.rotateTo(0);
 //    }
 
-    @SuppressWarnings("deprecation")
-	public float getTravelDistance() {
+    public float getTravelDistance() {
         return pilot.getTravelDistance();
     }
 
-    @SuppressWarnings("deprecation")
-	public void reset() {
+    public void reset() {
         pilot.reset();
     }
 
@@ -258,16 +253,14 @@ public class BrickController implements Controller {
     }
 
     // Not used at the moment, setWheelSpeeds gets called instead
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void backward(int speed) {
         pilot.setMoveSpeed(speed);
         pilot.backward();
     }
 
     // Not used at the moment, setWheelSpeeds gets called instead
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void forward(int speed) {
         pilot.setMoveSpeed(speed);
         pilot.forward();
@@ -318,8 +311,7 @@ public class BrickController implements Controller {
 
     }
 
-    @SuppressWarnings("deprecation")
-	@Override
+    @Override
     public void rotate(int deg, int speed) {
         pilot.setTurnSpeed(speed);
         pilot.rotate(deg / GEAR_ERROR_RATIO);
@@ -345,7 +337,6 @@ public class BrickController implements Controller {
 		// TODO make STUB
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void kickLeft() {
 		// TODO: Make it stay out?
@@ -361,7 +352,7 @@ public class BrickController implements Controller {
             public void run() {
                 try {
                     MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
-                    MOTORMUX.sendData(tentacleLeftDirection,forward);
+                    MOTORMUX.sendData(tentacleLeftDirection,backward);
                     
                     Thread.sleep(tentacleKickTime);
                     
@@ -369,9 +360,9 @@ public class BrickController implements Controller {
 
                     Thread.sleep(2000);
                     
-                    MOTORMUX.sendData(tentacleLeftDirection, backward);
+                    MOTORMUX.sendData(tentacleLeftDirection, forward);
 
-                	Thread.sleep(tentacleKickTime - 10);
+                	Thread.sleep(tentacleKickTime);
                 } catch (InterruptedException e) {
                     drawMessage("InterruptedException\nin kickLeft");
                 } finally {
@@ -384,7 +375,6 @@ public class BrickController implements Controller {
 		
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void kickRight() {
 		// TODO: Make it stay out?
@@ -418,7 +408,6 @@ public class BrickController implements Controller {
         }).start();
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void kickSides() {
 		// TODO: Make them stay out?
