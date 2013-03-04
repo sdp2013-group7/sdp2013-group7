@@ -13,8 +13,6 @@ import balle.strategy.Strategy;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
-import balle.world.objects.Ball;
-import balle.world.objects.Goal;
 import balle.world.objects.RectangularObject;
 import balle.world.objects.Robot;
 
@@ -23,9 +21,6 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	
 	private static Logger LOG = Logger.getLogger(DribbleAndScore.class);
 	private Robot ourRobot;
-	private Ball ball;
-	private Goal ourGoal;
-	private Goal opponentGoal;
 	private Robot enemyRobot;
 	private Strategy goToBallSafeStrategy;
 
@@ -43,11 +38,9 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	protected void onStep(Controller controller, Snapshot snapshot)
 			throws ConfusedException {
 
-		// Get positions or our robot, ball and goal
+		// Get positions of our robot and opponent
 		ourRobot = snapshot.getBalle();
 		enemyRobot = snapshot.getOpponent();
-		ourGoal = snapshot.getOwnGoal();
-		opponentGoal = snapshot.getOpponentsGoal();
 
 		// Check if robot is actually on the pitch
 		if (ourRobot.getPosition() == null) {
@@ -58,14 +51,6 @@ public class AvoidMilestone3 extends AbstractPlanner {
 			LOG.info("Where is enemy? :(");
 			return;
 		}
-		
-//		if (!ourRobot.isFacingGoal(opponentGoal)){
-//			
-//			ourGoal = snapshot.getOpponentsGoal();
-//			opponentGoal = snapshot.getOwnGoal();;
-//			
-//		}
-		
 		
 		
 		
