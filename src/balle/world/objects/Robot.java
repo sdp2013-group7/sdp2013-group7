@@ -106,6 +106,21 @@ public class Robot extends RectangularObject {
                 && ((otherRobot.getPosition() != null) && (!otherRobot
                         .intersects(getFacingLine())));
     }
+    
+    /**
+     * Checks if the robot can score from this position. That is if it is in
+     * possession of the ball, facing the goal and the ball is in a suitable 
+     * range
+     * 
+     * @param ball
+     * @param goal
+     * @return true, if is in scoring position
+     */
+    public boolean canScoreNoOpposition(Ball ball, Goal goal) {
+    	return possessesBall(ball) && isFacingGoal(goal) && 
+    			(ball.getPosition().dist(goal.getPosition()) <= 0.75)
+    			|| (this.getPosition().dist(goal.getPosition()) <= 0.75);
+    }
 
     /**
      * Returns true if robot is facing the goal. Similar to isInScoringPosition
