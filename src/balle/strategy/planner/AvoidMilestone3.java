@@ -92,21 +92,28 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		if (rotating) {
 			if (followingOriginalDirection) {
 				if (!opponentInFront) {
-					LOG.info("No opponent in the way!");
+					LOG.info("Opponent not in front any more. Start moving.");
 					controller.setWheelSpeeds(speed, speed);
 					rotating = false;
 					moving = true;
 					followingOriginalDirection = false;
 				}
+				else {
+					LOG.info("Opponent still in the way, continue turning.");
+				}
 			}
 			
 			else {
 				if (Math.abs(ourRobot.getOrientation().degrees() - originalDirection.degrees())<6) {
+					LOG.info("Back to original orientation. Start moving.");
 					controller.stop();
 					rotating = false;
 					moving = true;
 					followingOriginalDirection = true;
 					controller.setWheelSpeeds(speed, speed);
+				}
+				else {
+					LOG.info("Still not back to original orientation. Continue turning.");
 				}
 			}
 			
@@ -114,17 +121,20 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		
 		else {
 			if (!moving) {
+				LOG.info("Started moving.");
 				controller.setWheelSpeeds(speed, speed);
 				moving = true;
 				rotating = false;
 			}
 			
-			if (closeToWall(faceLine, pitchSides))
+			if (closeToWall(faceLine, pitchSides)) {
+				LOG.info("Close to wall. Stop.");
 				controller.stop();
+			}
 			
 			else if (opponentInFront) {
 				// Turn
-				LOG.info("Opponent!");
+				LOG.info("Opponent! Start turning.");
 				rotating = true;
 				moving = false;
 
@@ -139,6 +149,7 @@ public class AvoidMilestone3 extends AbstractPlanner {
 			}
 			
 			else if (!followingOriginalDirection) {
+
 				int originalDegrees = (int) originalDirection.degrees();
 				int currentDegrees = (int) ourRobot.getOrientation().degrees();
 				int rotationAngle = currentDegrees - originalDegrees;
@@ -168,8 +179,10 @@ public class AvoidMilestone3 extends AbstractPlanner {
 						controller.rotate(rotationAngle, 50);
 					rotating = true;
 					moving = false;
+					LOG.info("Not on original direction. Start turning.");
 				}
 				else {
+					LOG.info("Continue on alternative direction.");
 					controller.setWheelSpeeds(speed, speed);
 				}
 			}
