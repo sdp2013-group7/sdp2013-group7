@@ -70,6 +70,20 @@ public class Robot extends RectangularObject {
 
         return new Line(x0, y0, x1, y1);
     }
+    
+    public Line getFacingLine(double length) {
+        double x0, y0, x1, y1;
+        x0 = getPosition().getX();
+        y0 = getPosition().getY();
+
+        Coord target = new Coord(length, 0);
+        target = target.rotate(getOrientation());
+
+        x1 = x0 + target.getX();
+        y1 = y0 + target.getY();
+
+        return new Line(x0, y0, x1, y1);
+    }
 
     /**
      * Gets the facing line of the robot. Similar to the getFacingLine but the
