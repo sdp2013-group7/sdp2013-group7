@@ -79,7 +79,7 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		}
 		
 		// Get facing rectangle
-		Line faceLine = ourRobot.getFacingLine(0.4);
+		Line faceLine = ourRobot.getFacingLine(0.3);
 		RectangularObject faceRect = faceLine.widen(0.24);
 		
 		// Check if opponent is in our way
@@ -143,9 +143,9 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				double minDist1 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle1);
 				double minDist2 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle2);	
 				if (minDist1 > minDist2)
-					controller.rotate(90, 50);
+					controller.rotate(90, 30);
 				else
-					controller.rotate(-90, 50);
+					controller.rotate(-90, 30);
 			}
 			
 			else if (!followingOriginalDirection) {
@@ -174,9 +174,9 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				if (safeToTurnBack) {
 					controller.stop();
 					if (complementary)
-						controller.rotate(-rotationAngle, 50);
+						controller.rotate(-rotationAngle, 30);
 					else
-						controller.rotate(rotationAngle, 50);
+						controller.rotate(rotationAngle, 30);
 					rotating = true;
 					moving = false;
 					LOG.info("Not on original direction. Start turning.");
