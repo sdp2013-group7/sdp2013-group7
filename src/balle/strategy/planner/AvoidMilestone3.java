@@ -5,8 +5,8 @@ import java.awt.Color;
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
-import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableRectangularObject;
+import balle.main.drawable.Dot;
 import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
 import balle.strategy.Strategy;
@@ -23,6 +23,8 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	private Robot ourRobot;
 	private Robot enemyRobot;
 	private Strategy goToBallSafeStrategy;
+	private boolean turning = false;
+	private int orientationToReach;
 
 	public AvoidMilestone3() {
 		goToBallSafeStrategy = new GoToBallSafeProportional();
@@ -52,9 +54,54 @@ public class AvoidMilestone3 extends AbstractPlanner {
 			return;
 		}
 		
+		// Get facing rectangle
+		Line faceLine = ourRobot.getFacingLine();
+		RectangularObject faceRect = faceLine.widen(0.3);
+		
+		Line leftSide = faceRect.getLeftSide();
+		Line rightSide = faceRect.getRightSide();
+		Line frontSide = faceRect.getFrontSide();
+		Line backSide = faceRect.getBackSide();
+		
+		Coord corner1 = leftSide.getIntersect(frontSide);
+		Coord corner2 = leftSide.getIntersect(backSide);
+		Coord corner3 = rightSide.getIntersect(frontSide);
+		Coord corner4 = rightSide.getIntersect(backSide);
+		
+//		LOG.info("Corner 1: (" + corner1.x  + " , " + corner1.y + ")");
+//		LOG.info("Corner 2: (" + corner2.x  + " , " + corner2.y + ")");
+//		LOG.info("Corner 3: (" + corner3.x  + " , " + corner3.y + ")");
+//		LOG.info("Corner 4: (" + corner4.x  + " , " + corner4.y + ")");
 		
 		
-		//LOG.info(facingArea.containsCoord(enemyRobot.getPosition())) ;
+		
+		LOG.info("Line contains" + contains(ourRobot, faceRect, enemyRobot.getPosition()));
+		
+		// Check if opponent is in our way
+		boolean opponentInFront = contains(ourRobot, faceRect, enemyRobot.getPosition());
+		
+		// Move if opponent is not in front of us
+		if (!opponentInFront)
+		//	controller.setWheelSpeeds(300, 300);
+			controller.stop();
+			
+		// Otherwise stop
+		else
+			if (!turning) {
+				controller.stop();
+				double angleToTurn = 90.0;
+				orientationToReach = (int)(ourRobot.getOrientation().degrees() + angleToTurn) % 365;
+				//controller.rotate(90, 50);
+				turning = true;
+			}
+			else {
+
+			}
+			
+		
+		addDrawable(new DrawableRectangularObject(faceRect, Color.MAGENTA));
+		
+		
 		
 		
 		
@@ -71,18 +118,10 @@ public class AvoidMilestone3 extends AbstractPlanner {
 //			
 //			
 //		}
-		
-		
-		Line faceLine = ourRobot.getFacingLine();
-		
-		RectangularObject areaLine = faceLine.widen(0.2);
-		
-		addDrawable(new DrawableRectangularObject(areaLine, Color.MAGENTA));
+	
 		
 		//LOG.info("Height: " + areaLine.getHeight() + "Width: " + areaLine.getWidth());
 		//LOG.info("Rect pos: " + areaLine.getPosition() + "Robot pos: " + ourRobot.getPosition());
-
-		LOG.info("Line contains: "+contains(ourRobot, areaLine, enemyRobot.getPosition()));
 
 		
 		
@@ -238,24 +277,62 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		return true;
 	}
 	
+	public static boolean overOrUnderLine(Coord p1, Coord p2, Coord ptest) {
+		double p1x = p1.x;
+		double p1y = p1.y;
+		double p2x = p2.x;
+		double p2y = p2.y;
+		
+		double a = -(p2y - p1y);
+		double b = p2x - p1x;
+		double c = -(a*p1x + b*p1y);
+		
+		
+
+		
+		
+		
+		return (a*ptest.x + b*ptest.y + c) >= 0;
+		
+	}
+	
 	public static boolean contains(Robot ourRobot, RectangularObject areaLine, Coord point) {
 		
-		double xPoint = point.getX();
-		double yPoint = point.getY();
+		Line leftSide = areaLine.getLeftSide();
+		Line rightSide = areaLine.getRightSide();
+		Line frontSide = areaLine.getFrontSide();
+		Line backSide = areaLine.getBackSide();
 		
-		double rectHeight = areaLine.getHeight();
-		double rectWidth = areaLine.getWidth();
+		Coord corner1 = leftSide.getIntersect(frontSide);
+		Coord corner2 = leftSide.getIntersect(backSide);
+		Coord corner3 = rightSide.getIntersect(frontSide);
+		Coord corner4 = rightSide.getIntersect(backSide);
 		
-		double maxY = ourRobot.getPosition().y + rectWidth/2.0;
-		double minY = ourRobot.getPosition().y - rectWidth/2.0;
 		
-		double maxX = ourRobot.getPosition().x + rectHeight;
-		double minX = ourRobot.getPosition().x;
+//		
+//		double xPoint = point.getX();
+//		double yPoint = point.getY();
 		
-		if ((yPoint > minY && yPoint < maxY) && (xPoint > minX && xPoint < maxX))
-			return true;
 		
-		return false;
+		
+		boolean betweenLR = overOrUnderLine(corner1, corner2, point) != overOrUnderLine(corner3, corner4, point);
+		boolean betweenFR = overOrUnderLine(corner1, corner3, point) != overOrUnderLine(corner2, corner4, point);
+		
+		return betweenLR && betweenFR;
+		
+//		double rectHeight = areaLine.getHeight();
+//		double rectWidth = areaLine.getWidth();
+//		
+//		double maxY = ourRobot.getPosition().y + rectWidth/2.0;
+//		double minY = ourRobot.getPosition().y - rectWidth/2.0;
+//		
+//		double maxX = ourRobot.getPosition().x + 0.6;
+//		double minX = ourRobot.getPosition().x;
+//		
+//		if ((yPoint > minY && yPoint < maxY) && (xPoint > minX && xPoint < maxX))
+//			return true;
+//		
+//		return false;
 	}
 	
 
