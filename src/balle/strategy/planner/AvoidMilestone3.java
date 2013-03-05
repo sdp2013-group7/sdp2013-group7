@@ -8,6 +8,7 @@ import org.mockito.internal.util.ArrayUtils;
 import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 import balle.controller.Controller;
+import balle.main.drawable.DrawableLine;
 import balle.main.drawable.DrawableRectangularObject;
 import balle.main.drawable.Dot;
 import balle.strategy.ConfusedException;
@@ -34,8 +35,9 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	private Strategy avoidStrategy;
 	private boolean opponentInFront;
 	private boolean rotating = false;
+	private boolean moving = false;
 	private boolean followingOriginalDirection = true;
-	private Orientation originalDirection;
+	private Orientation originalDirection = null;
 	
 	
 
@@ -83,44 +85,97 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		// Check if opponent is in our way
 		opponentInFront = contains(ourRobot, enemyRobot, faceRect);
 		
-		// Stop if facing wall is too close
-		if (closeToWall(faceLine, pitchSides))
-			controller.stop();
+		// Check if we are going in right direction
+		if (originalDirection == null)
+			originalDirection = ourRobot.getOrientation();
 		
-		else {
-		
-			// Move if opponent is not in front of us
-			if (!opponentInFront) {
-				LOG.info("No opponent in the way!");
-				controller.setWheelSpeeds(speed, speed);
+		if (rotating) {
+			if (followingOriginalDirection) {
+				if (!opponentInFront) {
+					LOG.info("No opponent in the way!");
+					controller.setWheelSpeeds(speed, speed);
+					rotating = false;
+					moving = true;
+					followingOriginalDirection = false;
+				}
 			}
 			
 			else {
-				if (rotating && !opponentInFront) {
-					LOG.info("No opponent in the way!");
+				if (Math.abs(ourRobot.getOrientation().degrees() - originalDirection.degrees())<6) {
+					controller.stop();
 					rotating = false;
-					followingOriginalDirection = !followingOriginalDirection;
+					moving = true;
+					followingOriginalDirection = true;
 					controller.setWheelSpeeds(speed, speed);
 				}
-				// Otherwise turn
-				else if (!rotating) {
-					LOG.info("Opponent!");
-					
-					originalDirection = ourRobot.getOrientation();
-					rotating = true;
-					
-					double angle1 = 90.0;
-					double angle2 = 270.0;
-					double minDist1 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle1);
-					double minDist2 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle2);
-					
-					if (minDist1 > minDist2)
-						controller.rotate(90, 50);
+			}
+			
+		}
+		
+		else {
+			if (!moving) {
+				controller.setWheelSpeeds(speed, speed);
+				moving = true;
+				rotating = false;
+			}
+			
+			if (closeToWall(faceLine, pitchSides))
+				controller.stop();
+			
+			else if (opponentInFront) {
+				// Turn
+				LOG.info("Opponent!");
+				rotating = true;
+				moving = false;
+
+				double angle1 = 90.0;
+				double angle2 = 270.0;
+				double minDist1 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle1);
+				double minDist2 = distanceToClosestWall(ourRobot.getFacingLine(), pitchSides, angle2);	
+				if (minDist1 > minDist2)
+					controller.rotate(90, 50);
+				else
+					controller.rotate(-90, 50);
+			}
+			
+			else if (!followingOriginalDirection) {
+				int originalDegrees = (int) originalDirection.degrees();
+				int currentDegrees = (int) ourRobot.getOrientation().degrees();
+				int rotationAngle = currentDegrees - originalDegrees;
+				rotationAngle = ((rotationAngle % 365) + 365)%365;
+				boolean complementary = false;
+				if (originalDegrees + rotationAngle != currentDegrees) {
+					if (currentDegrees < originalDegrees)
+						complementary = true;
+				}
+				else {
+					if (currentDegrees > originalDegrees)
+						complementary = true;
+				}
+				Orientation rotateBy;
+				if (complementary)
+					rotateBy = new Orientation(Math.toRadians(365 - rotationAngle));
+				else
+					rotateBy = new Orientation(Math.toRadians(rotationAngle));
+				Line originalLine = faceLine.rotateAroundPoint(faceLine.getA(), rotateBy);
+				RectangularObject originalRect = originalLine.widen(0.24);
+				boolean safeToTurnBack = !contains(ourRobot, enemyRobot, originalRect);
+				if (safeToTurnBack) {
+					controller.stop();
+					if (complementary)
+						controller.rotate(-rotationAngle, 50);
 					else
-						controller.rotate(-90, 50);
+						controller.rotate(rotationAngle, 50);
+					rotating = true;
+					moving = false;
+				}
+				else {
+					controller.setWheelSpeeds(speed, speed);
 				}
 			}
+			
 		}
+		
 
 		
 		addDrawable(new DrawableRectangularObject(faceRect, Color.MAGENTA));
