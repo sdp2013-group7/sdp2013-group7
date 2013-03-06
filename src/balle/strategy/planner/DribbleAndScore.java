@@ -50,6 +50,8 @@ public class DribbleAndScore extends AbstractPlanner {
 		goal = snapshot.getOpponentsGoal();
 		
 		if (done) {
+			controller.dribblersOff();
+			controller.stop();
 			return;
 		}
 
@@ -62,7 +64,7 @@ public class DribbleAndScore extends AbstractPlanner {
 		if (hasBall && ourRobot.canScoreNoOpposition(ball, goal)) {
 			
 			LOG.info("Let's score a goal! and dribblers off");
-			controller.dribblersOff();
+			//controller.dribblersOff();
 			controller.kick();
 			done = true;
 
@@ -82,7 +84,7 @@ public class DribbleAndScore extends AbstractPlanner {
 				controller.rotate((int) angle, 50);
 				LOG.info("Angle: " + (int) angle);
 			}
-			
+
 			// Keep dribblers on
 			controller.dribblersOn();
 			LOG.info("dribblers on");
@@ -94,7 +96,27 @@ public class DribbleAndScore extends AbstractPlanner {
 			// "Add visuals to camera stream" personally unsure what this does
 			addDrawables(goToBallSafeStrategy.getDrawables());
 		} else if (hasBall && !ourRobot.canScoreNoOpposition(ball, goal)) {
-			LOG.info("Move forward a bit more");
+			LOG.info("Move forward a bit more - keep ball hack");
+			// get angle we need to turn to have ball in the centre of robot
+						double angle = ourRobot.getAngleToTurnToTarget(goal.getPosition());
+
+						// convert to degrees
+						angle = Math.toDegrees(angle) / 2;
+
+						// if angle is large enough (greater than 10) then turn to face ball
+						if (angle > 10 || angle < -10) {
+
+							controller.rotate((int) angle, 50);
+							LOG.info("Angle: " + (int) angle);
+						}
+
+						// Keep dribblers on
+						controller.dribblersOn();
+						LOG.info("dribblers on");
+						hasBall = true;
+						
+						// Use the strategy to go towards the ball
+						goToBallSafeStrategy.step(controller, snapshot);
 			controller.setWheelSpeeds(200, 200);
 			
 		} else {
@@ -110,7 +132,7 @@ public class DribbleAndScore extends AbstractPlanner {
 	}
 
 	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Dribble and Score", parameterNames = {})
+	@FactoryMethod(designator = "Dribble and Score M3", parameterNames = {})
 	public static DribbleAndScore factoryMethod() {
 		return new DribbleAndScore();
 	}
