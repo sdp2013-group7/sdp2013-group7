@@ -58,6 +58,49 @@ public class RectangularObject extends MovingPoint implements FieldObject {
         return rect.contains(point.getX(), point.getY());
     }
 
+	public boolean containsRobot(Robot robot) {
+
+		// Four sides of the rectangle
+		Line leftSide = this.getLeftSide();
+		Line rightSide = this.getRightSide();
+		Line frontSide = this.getFrontSide();
+		Line backSide = this.getBackSide();
+
+		// Four corner of the rectangle
+		Coord corner1 = leftSide.getIntersect(frontSide);
+		Coord corner2 = leftSide.getIntersect(backSide);
+		Coord corner3 = rightSide.getIntersect(frontSide);
+		Coord corner4 = rightSide.getIntersect(backSide);
+
+		// Sides of the enemy robot
+		Line enemyLeftSide = robot.getLeftSide();
+		Line enemyRightSide = robot.getRightSide();
+		Line enemyFrontSide = robot.getFrontSide();
+		Line enemyBackSide = robot.getBackSide();
+		
+		// Corners of the enemy robot
+		Coord[] corners = new Coord[4];
+		corners[0] = enemyLeftSide.getIntersect(enemyFrontSide);
+		corners[1] = enemyLeftSide.getIntersect(enemyBackSide);
+		corners[2] = enemyRightSide.getIntersect(enemyFrontSide);
+		corners[3] = enemyRightSide.getIntersect(enemyBackSide);
+
+		// Check every corner of the enemy robot is contained in the rectangle
+		for (Coord point : corners) {
+			Line l1 = new Line(corner1, corner2);
+			Line l2 = new Line(corner3, corner4);
+			Line l3 = new Line(corner1, corner3);
+			Line l4 = new Line(corner2, corner4);
+			boolean betweenLR = l1.overOrUnderLine(point) != l2.overOrUnderLine(point);
+			boolean betweenFR = l3.overOrUnderLine(point) != l4.overOrUnderLine(point);
+
+			if (betweenLR && betweenFR)
+				return true;
+		}
+
+		return false;
+	}
+
     @Override
     public boolean isNearWall(Pitch p) {
         return isNearWall(p, Globals.DISTANCE_TO_WALL);
@@ -107,7 +150,7 @@ public class RectangularObject extends MovingPoint implements FieldObject {
     }
 
     public Line getFrontSide() {
-        double hw = getWidth() / 2;
+        double hw = getWidth()/ 2;
         double hh = getHeight() / 2;
         Line a = new Line(hh, hw, hh, -hw);
         Orientation o = getOrientation();

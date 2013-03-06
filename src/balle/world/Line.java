@@ -280,5 +280,19 @@ public class Line {
 	public String toString() {
 		return "(" + a.toString() + ", " + b.toString() + ")";
 	}
+	
+	public boolean overOrUnderLine(Coord ptest) {
+		double p1x = this.getA().x;
+		double p1y = this.getA().y;
+		double p2x = this.getB().x;
+		double p2y = this.getB().y;
+
+		double a = -(p2y - p1y);
+		double b = p2x - p1x;
+		double c = -(a * p1x + b * p1y);
+
+		return (a * ptest.x + b * ptest.y + c) >= 0;
+
+	}
 
 }
