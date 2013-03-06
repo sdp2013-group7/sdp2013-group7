@@ -20,41 +20,42 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	private static Logger LOG = Logger.getLogger(DribbleAndScore.class);
 	// Strategy
 	private Strategy avoidStrategy;
-	
+
 	private boolean done = false;
-	
+
 	// Robots
 	private Robot ourRobot;
 	private Robot enemyRobot;
-	
+
 	// Robot status
 	private boolean rotating = false;
 	private boolean moving = false;
 	private boolean rotatingClockwise = false;
 	private boolean rotatingToAvoid = false;
 	private boolean movingToAvoid = false;
-	
+
 	// Movement data
 	private Coord startPoint;
-	
+
 	// Rotation data
 	private boolean firstRotationClockwise = false;
-	
+
 	// Robot orientation
 	private Orientation originalDirection = null;
 	private Line faceLine;
-	
+
 	// Opponent status
 	private boolean opponentInFront;
-	
+	private double opponentDistance;
+
 	// Speeds
 	private int motorSpeed = 200;
 	private int turnSpeed = 20;
 	private int turnAngle = 2;
-	
+
 	// Pitch
 	private Line[] pitchSides = new Line[4];
-	
+
 	public AvoidMilestone3() {
 
 		avoidStrategy = new GoToBallSafeProportional();
@@ -77,7 +78,7 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot)
 			throws ConfusedException {
-		
+
 		if (done) {
 			return;
 		}
@@ -100,9 +101,10 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		faceLine = ourRobot.getFacingLine(0.4);
 		RectangularObject faceRect = faceLine.widen(0.20);
 
-
 		// Check if opponent is in our way
 		opponentInFront = faceRect.containsRobot(enemyRobot);
+
+		opponentDistance = ourRobot.getFrontSide().dist(enemyRobot.getPosition());
 
 		// Check if we are going in right direction
 		if (originalDirection == null)
@@ -110,12 +112,12 @@ public class AvoidMilestone3 extends AbstractPlanner {
 
 		if (rotating)
 			this.rotating(controller);
-		
+
 		else if (moving) {
 			this.moving(controller);
 			return;
 		}
-		
+
 		else {
 			this.startMoving(controller);
 			return;
@@ -124,18 +126,18 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		addDrawable(new DrawableRectangularObject(faceRect, Color.MAGENTA));
 
 	}
-	
+
 	protected void rotating(Controller controller) {
-		
+
 		if (rotatingToAvoid) {
-			
+
 			if (opponentInFront) {
 				if (rotatingClockwise)
 					controller.rotate(-turnAngle, turnSpeed);
-				else 
+				else
 					controller.rotate(turnAngle, turnSpeed);
 			}
-			
+
 			else {
 				LOG.info("Stopping rotation. Moving in new direction.");
 				rotating = false;
@@ -145,10 +147,11 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				controller.setWheelSpeeds(motorSpeed, motorSpeed);
 			}
 		}
-		
+
 		else {
 			LOG.info("Back to original direction. Stopping rotation.");
-			if (Math.abs(ourRobot.getOrientation().degrees() - originalDirection.degrees()) < 4) {
+			if (Math.abs(ourRobot.getOrientation().degrees()
+					- originalDirection.degrees()) < 4) {
 				LOG.info("here");
 				rotating = false;
 				moving = true;
@@ -159,24 +162,24 @@ public class AvoidMilestone3 extends AbstractPlanner {
 			else {
 				if (rotatingClockwise)
 					controller.rotate(-turnAngle, turnSpeed);
-				else 
+				else
 					controller.rotate(turnAngle, turnSpeed);
 			}
 		}
 	}
-	
+
 	protected void moving(Controller controller) {
-		
+
 		Line frontLine = ourRobot.getFacingLine(0.24);
 		RectangularObject frontRect = frontLine.widen(0.30);
 		addDrawable(new DrawableRectangularObject(frontRect, Color.RED));
-		
+
 		if (closeToWall(frontRect, pitchSides)) {
 			LOG.info("Too close to the wall. Stopping.");
 			controller.stop();
 			done = true;
 		}
-		
+
 		else if (movingToAvoid) {
 			Coord currentPosition = ourRobot.getPosition();
 			if (currentPosition.dist(startPoint) > 0.30) {
@@ -185,41 +188,56 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				rotating = true;
 				rotatingToAvoid = false;
 				rotatingClockwise = !firstRotationClockwise;
-			}
-			else if (opponentInFront) {
+			} else if (opponentInFront) {
 				moving = false;
 				rotating = true;
 				rotatingToAvoid = true;
 			}
 		}
-		
-		else if (opponentInFront) {
-			// Turn
-			LOG.info("Opponent is in the way. Starting to turn.");
-			
-			moving = false;
-			rotating = true;
-			rotatingToAvoid = true;
 
-			double angle1 = 90.0;
-			double angle2 = 270.0;
-			double minDist1 = distanceToClosestWall(
-					ourRobot.getFacingLine(), pitchSides, angle1);
-			double minDist2 = distanceToClosestWall(
-					ourRobot.getFacingLine(), pitchSides, angle2);
-			if (minDist1 > minDist2){
-				LOG.info("Rotating anti-clockwise.");
-				rotatingClockwise = false;
-				firstRotationClockwise = false;
-				controller.rotate(turnAngle, turnSpeed);
-			}
-			else{
-				LOG.info("Rotating clockwise.");
-				rotatingClockwise = true;
-				firstRotationClockwise = true;
-				controller.rotate(-turnAngle, turnSpeed);
+		else if (opponentInFront) {
+
+			if (opponentDistance < 0.2) {
+
+				LOG.info("opponent too close, backing off: " + opponentDistance);
+
+				this.backtracks(controller);
+
+			} else {
+
+				controller.stop();
+				// Turn
+				LOG.info("Opponent is in the way. Starting to turn.");
+
+				moving = false;
+				rotating = true;
+				rotatingToAvoid = true;
+
+				double angle1 = 90.0;
+				double angle2 = 270.0;
+				double minDist1 = distanceToClosestWall(
+						ourRobot.getFacingLine(), pitchSides, angle1);
+				double minDist2 = distanceToClosestWall(
+						ourRobot.getFacingLine(), pitchSides, angle2);
+				if (minDist1 > minDist2) {
+					LOG.info("Rotating anti-clockwise.");
+					rotatingClockwise = false;
+					firstRotationClockwise = false;
+					controller.rotate(turnAngle, turnSpeed);
+				} else {
+					LOG.info("Rotating clockwise.");
+					rotatingClockwise = true;
+					firstRotationClockwise = true;
+					controller.rotate(-turnAngle, turnSpeed);
+				}
 			}
 		}
+	}
+
+	private void backtracks(Controller controller) {
+
+		controller.setWheelSpeeds(-motorSpeed, -motorSpeed);
+
 	}
 
 	protected void startMoving(Controller controller) {
