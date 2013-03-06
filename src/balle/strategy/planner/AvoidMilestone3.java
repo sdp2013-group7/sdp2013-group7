@@ -101,18 +101,18 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				else {
 					LOG.info("NOOOOOOOOOO");
 					if (rotatingClockwise)
-						controller.rotate(-5, 50);
+						controller.rotate(-2, 50);
 					else 
-						controller.rotate(5, 50);
+						controller.rotate(2, 50);
 				}
 			}
 
 			else {
 				if (opponentInFront) {
 					if (rotatingClockwise)
-						controller.rotate(-5, 50);
+						controller.rotate(-2, 50);
 					else 
-						controller.rotate(5, 50);
+						controller.rotate(2, 50);
 				}
 				
 				else if (Math.abs(ourRobot.getOrientation().degrees()- originalDirection.degrees()) < 6) {
@@ -126,9 +126,9 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				
 				else {
 					if (rotatingClockwise)
-						controller.rotate(-5, 50);
+						controller.rotate(-2, 50);
 					else 
-						controller.rotate(5, 50);
+						controller.rotate(2, 50);
 					LOG.info("Rotating clockwise:" + rotatingClockwise);
 					
 					
@@ -139,10 +139,26 @@ public class AvoidMilestone3 extends AbstractPlanner {
 
 		else {
 			if (!moving) {
-				controller.setWheelSpeeds(leftSpeed, rightSpeed);
+				//controller.setWheelSpeeds(leftSpeed, leftSpeed);
 				moving = true;
 				rotating = false;
+				controller.setWheelSpeeds(leftSpeed, rightSpeed);
 			}
+			
+//			else if (moving && !opponentInFront) {
+//				double angle = ourRobot.getAngleToTurnToTarget(enemyRobot.getPosition());
+//
+//				// convert to degrees
+//				angle = Math.toDegrees(angle) / 2;
+//				
+//				// if angle is large enough (greater than 10) then turn to face ball
+//				if (angle > 5 || angle < -5) {
+//
+//					controller.rotate((int) angle, 10);
+//					LOG.info("Angle: " + (int) angle);
+//					controller.setWheelSpeeds(leftSpeed, rightSpeed);
+//				}
+//			}
 
 			if (closeToWall(faceLine, pitchSides))
 				controller.stop();
@@ -163,13 +179,13 @@ public class AvoidMilestone3 extends AbstractPlanner {
 				if (minDist1 > minDist2){
 					rotatingClockwise = false;
 					initialTurnClockwise = false;
-					controller.rotate(5, 50);
+					controller.rotate(2, 50);
 					LOG.info("inital rotation complete");
 				}
 				else{
 					rotatingClockwise = true;
 					initialTurnClockwise = true;
-					controller.rotate(-5, 50);
+					controller.rotate(-2, 50);
 					LOG.info("inital rotation complete");
 				}
 			}
