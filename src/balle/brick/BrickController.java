@@ -159,20 +159,20 @@ public class BrickController implements Controller {
 
         isKicking = true;
         
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     MOTORMUX.sendData(kicker1Speed,kickSpeed);
                     MOTORMUX.sendData(kicker2Speed,kickSpeed);
-
-                    MOTORMUX.sendData(kicker1Direction,backward);
-                    MOTORMUX.sendData(kicker2Direction,backward);
+                    
+                    MOTORMUX.sendData(kicker1Direction,forward);
+                    MOTORMUX.sendData(kicker2Direction,forward);
                 	
                     Thread.sleep(mainKickTime);
                     
-                    MOTORMUX.sendData(kicker1Direction, forward);
-                    MOTORMUX.sendData(kicker2Direction, forward);
+                    MOTORMUX.sendData(kicker1Direction, backward);
+                    MOTORMUX.sendData(kicker2Direction, backward);
                     
                     Thread.sleep(mainKickTime - 60);
                 } catch (InterruptedException e) {
@@ -186,7 +186,15 @@ public class BrickController implements Controller {
                 	isKicking = false;
                 }
             }
-        }).start();
+        });
+        t.start();
+        try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+        
     }
 
 //    public void gentleKick(int speed, int angle) {
