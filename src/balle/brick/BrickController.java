@@ -450,6 +450,36 @@ public class BrickController implements Controller {
 	}
 	
 	@Override
+	public void extendBoth() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void extendLeft() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void extendRight() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractBoth() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractLeft() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractRight() {
+		// TODO: Method stub
+	}
+	
+	@Override
 	public void playVerdi() {
         // Play Verdi's Requiem
 		if (Sound.getTime() == 0) {

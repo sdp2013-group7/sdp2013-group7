@@ -243,6 +243,36 @@ public class BluetoothController implements Controller {
         }
 	}
 	
+	@Override
+	public void extendBoth() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void extendLeft() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void extendRight() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractBoth() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractLeft() {
+		// TODO: Method stub
+	}
+	
+	@Override
+	public void retractRight() {
+		// TODO: Method stub
+	}
+	
 /*	@Override
 	public void gentleKick(int speed, int angle) {
 		// TODO Auto-generated method stub
