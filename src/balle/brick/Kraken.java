@@ -215,7 +215,7 @@ public class Kraken {
                 	
                     // Get the data from the multiplexer
                     SENSORMUX.getData(15, sensorBuffer, 1);
-            		byte sensorValues = sensorBuffer[0];
+            		byte sensorValues = sensorBuffer[0]; // (byte) 15;
             		
             		boolean backLeft = (sensorValues & 1) == 0; // Port 1
             		boolean lowerFrontLeft = (sensorValues & 2) == 0; // Port 2
