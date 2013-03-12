@@ -18,7 +18,7 @@ import balle.world.objects.Robot;
 
 public class NewDribble extends AbstractPlanner {
 	
-	private Logger LOG = Logger.getLogger(DribbleAndScore.class);
+	private Logger LOG = Logger.getLogger(NewDribble.class);
 	private Robot ourRobot;
 	private Ball ball;
 	private Strategy goToBallSafeStrategy;
