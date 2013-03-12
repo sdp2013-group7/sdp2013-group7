@@ -125,6 +125,35 @@ public class Kraken {
         		controller.dribblersOn();
         } else if (name.equals(MessageVerdi.NAME)) {
         	controller.playVerdi();
+        } else if (name.equals(MessageMoveTentacle.NAME)) {
+        	int leftRightBoth = ((MessageMoveTentacle) decodedMessage).getTentacle();
+        	int extendRetract = ((MessageMoveTentacle) decodedMessage).getAction();
+        	
+        	if (leftRightBoth == 0) {
+        		// Only left
+        		
+        		if (extendRetract == 0)
+        			controller.extendLeft();
+        		else
+        			controller.retractLeft();
+        		
+        	} else if (leftRightBoth == 1) {
+        		// Only right
+        		
+        		if (extendRetract == 0)
+        			controller.extendRight();
+        		else
+        			controller.retractRight();
+        		
+        	} else {
+        		// Both
+        		
+        		if (extendRetract == 0)
+        			controller.extendBoth();
+        		else
+        			controller.retractBoth();
+        	}
+        			
         } else {
             return false;
         }

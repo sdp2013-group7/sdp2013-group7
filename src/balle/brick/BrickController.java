@@ -452,31 +452,37 @@ public class BrickController implements Controller {
 	@Override
 	public void extendBoth() {
 		// TODO: Method stub
+		drawMessage("extb");
 	}
 	
 	@Override
 	public void extendLeft() {
 		// TODO: Method stub
+		drawMessage("extl");
 	}
 	
 	@Override
 	public void extendRight() {
 		// TODO: Method stub
+		drawMessage("extr");
 	}
 	
 	@Override
 	public void retractBoth() {
 		// TODO: Method stub
+		drawMessage("retb");
 	}
 	
 	@Override
 	public void retractLeft() {
 		// TODO: Method stub
+		drawMessage("retl");
 	}
 	
 	@Override
 	public void retractRight() {
 		// TODO: Method stub
+		drawMessage("retr");
 	}
 	
 	@Override

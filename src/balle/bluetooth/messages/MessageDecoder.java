@@ -46,6 +46,10 @@ public class MessageDecoder {
             	return new MessageDribblers(onOff);
             case MessageVerdi.OPCODE:
             	return new MessageVerdi();
+            case MessageMoveTentacle.OPCODE:
+            	int[] moveTentacleArguments = MessageMove
+                		.decodeArgumentsFromHash(hashedMessage);
+            	return new MessageMoveTentacle(moveTentacleArguments[0], moveTentacleArguments[1]);
             default:
                 // Unknown type
                 return null;
