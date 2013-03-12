@@ -3,10 +3,10 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
-import balle.strategy.planner.DribbleAndScore;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
+import balle.world.objects.Goal;
 import balle.world.objects.Robot;
 
 /* A strategy to get the ball away from the walls using the dribblers.
@@ -21,9 +21,10 @@ public class NewDribble extends AbstractPlanner {
 	private Logger LOG = Logger.getLogger(NewDribble.class);
 	private Robot ourRobot;
 	private Ball ball;
+	private Goal goal;
 	private Strategy goToBallSafeStrategy;
 	private boolean done = false;
-
+    
 
 	public NewDribble() {
 		goToBallSafeStrategy = new GoToBallSafeProportional();
@@ -39,8 +40,10 @@ public class NewDribble extends AbstractPlanner {
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 		
+		
 		ourRobot = snapshot.getBalle();
 		ball = snapshot.getBall();
+		goal = snapshot.getOpponentsGoal();
 		
 		// Check if the strategy is finished.
 		if (done) {
@@ -68,8 +71,34 @@ public class NewDribble extends AbstractPlanner {
 		else {
 			controller.dribblersOn();
 			LOG.info("The dribblers have been turned on");
-			controller.setWheelSpeeds(-100,-100);
-			done=true;
+			
+			// Condition for turning when the goal is left or right
+			if (goal.isLeftGoal()){
+				
+				// Condition for our robot being in the upper part or the lower part of the pitch 
+				if (ourRobot.getPosition().getY()<0.6){
+					LOG.info("The goal is left and we are down.");
+	    			controller.setWheelSpeeds(-50,-100);
+				} else {
+					LOG.info("The goal is left and we are up");
+	    			controller.setWheelSpeeds(-100,-50);
+				}
+			} else{
+				
+				// Condition for our robot being in the upper part or the lower part of the pitch 
+				if (ourRobot.getPosition().getY()<0.6){
+					LOG.info("The goal is right and we are down.");
+	    			controller.setWheelSpeeds(-100,-50);
+				} else {
+					LOG.info("The goal is right and we are up");
+	    			controller.setWheelSpeeds(-50,-100);
+				}
+			}
+			
+			// We are executing the turn until we are facing the goalpost.
+			if (ourRobot.isFacingGoal(goal)){
+				done=true;
+			}
 		}
 		
 	}
