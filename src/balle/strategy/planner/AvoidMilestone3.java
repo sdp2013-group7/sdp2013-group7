@@ -174,7 +174,7 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		RectangularObject frontRect = frontLine.widen(0.30);
 		addDrawable(new DrawableRectangularObject(frontRect, Color.RED));
 
-		if (closeToWall(frontRect, pitchSides)) {
+		if (ourRobot.willHitWall()) {
 			LOG.info("Too close to the wall. Stopping.");
 			controller.stop();
 			done = true;
@@ -245,16 +245,6 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		moving = true;
 		rotating = false;
 		controller.setWheelSpeeds(motorSpeed, motorSpeed);
-	}
-
-	public static boolean closeToWall(RectangularObject facingRect, Line[] sides) {
-
-		for (Line side : sides) {
-			if (facingRect.intersects(side))
-				return true;
-		}
-
-		return false;
 	}
 
 	public static double distanceToClosestWall(Line facingLine,

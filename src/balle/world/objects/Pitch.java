@@ -4,8 +4,19 @@ import balle.world.Coord;
 import balle.world.Line;
 
 public class Pitch extends StaticFieldObject {
+	
+	// Pitch dimensions
+	private final double pitchWidth, pitchLength;
 
+	// Coordinates
     private final double minX, maxX, minY, maxY;
+    
+    // Corners 
+    private final Coord cornerLeftTop, cornerRightTop, cornerLeftBottom, cornerRightBottom;
+    
+    // Sides
+    private final Line leftSide, rightSide, topSide, bottomSide;
+    
 
     public double getMinX() {
         return minX;
@@ -22,12 +33,33 @@ public class Pitch extends StaticFieldObject {
     public double getMaxY() {
         return maxY;
     }
+    
+    public Pitch() {
+    	this(0, 2.44, 0, 1.22);
+    }
 
     public Pitch(double minX, double maxX, double minY, double maxY) {
+    	// Set coordinates
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
+        
+    	// Pitch dimensions
+		this.pitchWidth = Math.abs(maxY - minY);
+		this.pitchLength = Math.abs(maxX - minX);
+		
+		// Set pitch corners
+		cornerLeftTop = new Coord(maxX, maxY);
+		cornerRightTop = new Coord(maxX, minY);
+		cornerLeftBottom = new Coord(minX, maxY);
+		cornerRightBottom = new Coord(minX, minY);
+		
+		// Set pitch sides
+		leftSide = new Line(cornerLeftBottom, cornerLeftTop);
+		rightSide = new Line(cornerRightBottom, cornerRightTop);
+		topSide = new Line(cornerRightTop, cornerLeftTop);
+		bottomSide = new Line(cornerRightBottom, cornerLeftBottom);
     }
 
     @Override
@@ -47,17 +79,27 @@ public class Pitch extends StaticFieldObject {
             return false;
         return true;
     }
+    
+	public Line[] getWalls() {
+		return new Line[] {leftSide, rightSide, topSide, bottomSide};
+	}
 
 	public Line getLeftWall() {
-		return new Line(new Coord(minX, maxY), new Coord(minX, minY));
+		return leftSide;
 	}
-	public Line[] getWalls() {
-		return new Line[] {
-				new Line(new Coord(minX, minY), new Coord(maxX, minY)),
-				new Line(new Coord(maxX, minY), new Coord(maxX, maxY)),
-				new Line(new Coord(maxX, maxY), new Coord(minX, maxY)),
-				getLeftWall(), };
+	
+	public Line getRightWall() {
+		return rightSide;
 	}
+	
+	public Line getTopWall() {
+		return topSide;
+	}
+	
+	public Line getBottomWall() {
+		return bottomSide;
+	}
+
 
 	@Override
 	public boolean intersects(Line line) {

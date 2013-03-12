@@ -8,6 +8,8 @@ import balle.world.Orientation;
 import balle.world.Velocity;
 
 public class Robot extends RectangularObject {
+	
+	private final Pitch thePitch = new Pitch();
 
 	public Robot(Coord position, Velocity velocity,
 			AngularVelocity angularVelocity, Orientation orientation) {
@@ -365,5 +367,76 @@ public class Robot extends RectangularObject {
 
 	public double getRightWheelSpeed() {
 		return helperWheelSpeed(relR);
+	}
+	
+	/**
+	 * Returns a facing rectangle for the robot, with appropriate 
+	 * dimensions to detect whether the robot will hit a wall
+	 * 
+	 * @return a rectangle that acts as a wall-detector
+	 */
+	private RectangularObject wallDetectionRect() {
+		// Get facing line of appropriate length
+		Line frontLine = this.getFacingLine(0.24);
+		
+		// Widen facing line to obtain a wall-detecting facing rectangle
+		RectangularObject frontRect = frontLine.widen(0.30);
+		
+		return frontRect;
+	}
+	
+    /**
+     * Determines whether the robot is going to hit any wall, provided
+     * it goes it a straight line.
+     * 
+     * @return true if it will hit a wall, false otherwise
+     */
+	public boolean willHitWall() {
+		
+		return willHitLeftWall() || willHitRightWall() || willHitTopWall() || willHitBottomWall();
+	}
+	
+    /**
+     * Determines whether the robot is going to hit the left wall, 
+     * provided it goes it a straight line.
+     * 
+     * @return true if robot will hit wall, false otherwise
+     */
+	public boolean willHitLeftWall() {
+		
+		return wallDetectionRect().intersects(thePitch.getLeftWall());
+	}
+	
+    /**
+     * Determines whether the robot is going to hit the right wall, 
+     * provided it goes it a straight line.
+     * 
+     * @return true if robot will hit wall, false otherwise
+     */
+	public boolean willHitRightWall() {
+		
+		return wallDetectionRect().intersects(thePitch.getRightWall());
+	}
+	
+    /**
+     * Determines whether the robot is going to hit the top wall, 
+     * provided it goes it a straight line.
+     * 
+     * @return true if robot will hit wall, false otherwise
+     */
+	public boolean willHitTopWall() {
+		
+		return wallDetectionRect().intersects(thePitch.getTopWall());
+	}
+	
+    /**
+     * Determines whether the robot is going to hit the bottom wall, 
+     * provided it goes it a straight line.
+     * 
+     * @return true if robot will hit wall, false otherwise
+     */
+	public boolean willHitBottomWall() {
+		
+		return wallDetectionRect().intersects(thePitch.getBottomWall());
 	}
 }
