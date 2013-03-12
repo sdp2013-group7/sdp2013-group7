@@ -96,6 +96,21 @@ public interface Controller {
      */
     public abstract void dribblersOff();
     
+    
+    /*
+     * The methods for extending the tentacles
+     */
+    public abstract void extendBoth();
+    public abstract void extendLeft();
+    public abstract void extendRight();
+    
+    /*
+     * The methods for retracting the tentacles
+     */
+    public abstract void retractBoth();
+    public abstract void retractLeft();
+    public abstract void retractRight();
+    
     /**
      * Play Verdi's Requiem
      */

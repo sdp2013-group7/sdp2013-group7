@@ -140,6 +140,36 @@ public class DummyController implements Controller {
 	}
 	
 	@Override
+	public void extendBoth() {
+		System.out.println("Extend both tentacles");
+	}
+	
+	@Override
+	public void extendLeft() {
+		System.out.println("Extend the left tentacle");
+	}
+	
+	@Override
+	public void extendRight() {
+		System.out.println("Extend the right tentacle");
+	}
+	
+	@Override
+	public void retractBoth() {
+		System.out.println("Retract both tentacles");
+	}
+	
+	@Override
+	public void retractLeft() {
+		System.out.println("Retract the left tentacle");
+	}
+	
+	@Override
+	public void retractRight() {
+		System.out.println("Retract the right tentacle");
+	}
+	
+	@Override
 	public void playVerdi(){
 		System.out.println("Play Verdi's Requiem");
 	}

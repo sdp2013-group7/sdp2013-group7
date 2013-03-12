@@ -103,6 +103,18 @@ public class Run {
             		controller.kickRight();
             	} else if (command.equals("kicks")) {
             		controller.kickSides();
+            	} else if (command.equals("extb")) {
+            		controller.extendBoth();
+            	} else if (command.equals("extl")) {
+            		controller.extendLeft();
+            	} else if (command.equals("extr")) {
+            		controller.extendRight();
+            	} else if (command.equals("retb")) {
+            		controller.retractBoth();
+            	} else if (command.equals("retl")) {
+            		controller.retractLeft();
+            	} else if (command.equals("retr")) {
+            		controller.retractRight();
             	} else if (command.equals("quit")) {
             	    break;
             	}

@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import lejos.nxt.Button;
+import lejos.nxt.I2CPort;
+import lejos.nxt.I2CSensor;
 import lejos.nxt.LCD;
 import lejos.nxt.SensorPort;
 import lejos.nxt.Sound;
@@ -66,6 +68,10 @@ class ListenerThread extends Thread {
  */
 public class Kraken {
 
+	
+    private static I2CSensor SENSORMUX;
+    private static final int MUX_ADDRESS = 68;
+    
     /**
      * Processes the decoded message and issues correct commands to controller
      * 
@@ -119,6 +125,35 @@ public class Kraken {
         		controller.dribblersOn();
         } else if (name.equals(MessageVerdi.NAME)) {
         	controller.playVerdi();
+        } else if (name.equals(MessageMoveTentacle.NAME)) {
+        	int leftRightBoth = ((MessageMoveTentacle) decodedMessage).getTentacle();
+        	int extendRetract = ((MessageMoveTentacle) decodedMessage).getAction();
+        	
+        	if (leftRightBoth == 0) {
+        		// Only left
+        		
+        		if (extendRetract == 0)
+        			controller.extendLeft();
+        		else
+        			controller.retractLeft();
+        		
+        	} else if (leftRightBoth == 1) {
+        		// Only right
+        		
+        		if (extendRetract == 0)
+        			controller.extendRight();
+        		else
+        			controller.retractRight();
+        		
+        	} else {
+        		// Both
+        		
+        		if (extendRetract == 0)
+        			controller.extendBoth();
+        		else
+        			controller.retractBoth();
+        	}
+        			
         } else {
             return false;
         }
@@ -131,13 +166,19 @@ public class Kraken {
      * @param args
      */
     public static void main(String[] args) {
-
+    	
+    	// Assign a port to the sensor multiplexer
+    	I2CPort I2Cport = SensorPort.S4;
+    	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
+    	
+    	// Set up the multiplexer
+    	SENSORMUX = new I2CSensor(I2Cport);
+    	SENSORMUX.setAddress(MUX_ADDRESS);
+    	byte[] sensorBuffer = new byte[1];
+    	
+    	// Set up the other sensors
         TouchSensor touchRight = new TouchSensor(SensorPort.S2);
         TouchSensor touchLeft = new TouchSensor(SensorPort.S1);
-
-        // TODO: Fix this when the sensor multiplexer gets added
-        //TouchSensor touchBackRight = new TouchSensor(SensorPort.S4);
-        TouchSensor touchBackLeft = new TouchSensor(SensorPort.S3);
 
         while (true) {
             // Enter button click will halt the program
@@ -171,25 +212,37 @@ public class Kraken {
                     return;
                 }
                 try {
-                    // Check for sensors when idle
-                    if (touchLeft.isPressed() || touchRight.isPressed()) {
+                	
+                    // Get the data from the multiplexer
+                    SENSORMUX.getData(15, sensorBuffer, 1);
+            		byte sensorValues = sensorBuffer[0];
+            		
+            		boolean backLeft = (sensorValues & 1) == 0; // Port 1
+            		boolean lowerFrontLeft = (sensorValues & 2) == 0; // Port 2
+            		boolean lowerFrontRight = (sensorValues & 4) == 0; // Port 3
+            		boolean backRight = (sensorValues & 8) == 0; // Port 4
+                	
+                    // Check for the front sensors
+                    if (touchLeft.isPressed() || touchRight.isPressed() || lowerFrontLeft || lowerFrontRight) {
                         controller.setWheelSpeeds(
                                 -controller.getMaximumWheelSpeed(),
                                 -controller.getMaximumWheelSpeed());
-                        drawMessage("Obstacle detected. Backing up");
-                        Thread.sleep(200);
+                        drawMessage("Obstacle detected\nBacking up");
+                        Thread.sleep(150);
                         controller.stop();
                     }
 
                     // Check for back sensors as well
-                    if (touchBackLeft.isPressed() /*|| touchBackRight.isPressed()*/) {
+                    if (backRight || backLeft) {
                         controller.setWheelSpeeds(
                                 controller.getMaximumWheelSpeed(),
                                 controller.getMaximumWheelSpeed());
-                        drawMessage("Obstacle detected (back). Backing up");
-                        Thread.sleep(200);
+                        drawMessage("Obstacle detected\nForward!");
+                        Thread.sleep(150);
                         controller.stop();
                     }
+                    
+
 
                     if (!listener.available())
                         continue;

@@ -52,10 +52,9 @@ public class BrickController implements Controller {
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
     private final int tentacleKickTime = 100;
-    private final int mainKickTime = 120;
+    private final int mainKickTime = 80;
 
     // The mux and its address
-    // TODO: Make the mux volatile? Is it necessary?
     private final I2CSensor MOTORMUX;
     private final int MUX_ADDRESS = 0xB4;
     
@@ -82,12 +81,6 @@ public class BrickController implements Controller {
     	
     	MOTORMUX = new I2CSensor(I2Cport);
     	MOTORMUX.setAddress(MUX_ADDRESS);
-    	
-    	// Register sweep
-    	// Sometimes refuses to work otherwise, documents say
-    	// the reason for this is unknown    	
-    	
-//    	registerSweep();
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
                 RIGHT_WHEEL, INVERSE_WHEELS);
@@ -181,7 +174,7 @@ public class BrickController implements Controller {
                     MOTORMUX.sendData(kicker1Direction, forward);
                     MOTORMUX.sendData(kicker2Direction, forward);
                     
-                    Thread.sleep(mainKickTime - 80);
+                    Thread.sleep(mainKickTime - 60);
                 } catch (InterruptedException e) {
                     drawMessage("InterruptedException\nin kick");
                 } finally {
@@ -454,6 +447,42 @@ public class BrickController implements Controller {
 	@Override
 	public void dribblersOff() {
 		DRIBBLER.stop();
+	}
+	
+	@Override
+	public void extendBoth() {
+		// TODO: Method stub
+		drawMessage("extb");
+	}
+	
+	@Override
+	public void extendLeft() {
+		// TODO: Method stub
+		drawMessage("extl");
+	}
+	
+	@Override
+	public void extendRight() {
+		// TODO: Method stub
+		drawMessage("extr");
+	}
+	
+	@Override
+	public void retractBoth() {
+		// TODO: Method stub
+		drawMessage("retb");
+	}
+	
+	@Override
+	public void retractLeft() {
+		// TODO: Method stub
+		drawMessage("retl");
+	}
+	
+	@Override
+	public void retractRight() {
+		// TODO: Method stub
+		drawMessage("retr");
 	}
 	
 	@Override

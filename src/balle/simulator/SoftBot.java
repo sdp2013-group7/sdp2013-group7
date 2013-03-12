@@ -221,6 +221,24 @@ public class SoftBot implements Controller {
 	public void dribblersOff() {}
 	
 	@Override
+	public void extendBoth() {}
+	
+	@Override
+	public void extendLeft() {}
+	
+	@Override
+	public void extendRight() {}
+	
+	@Override
+	public void retractBoth() {}
+	
+	@Override
+	public void retractLeft() {}
+	
+	@Override
+	public void retractRight() {}
+	
+	@Override
 	public void playVerdi(){}
 	
 }

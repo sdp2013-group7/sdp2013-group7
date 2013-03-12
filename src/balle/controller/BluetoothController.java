@@ -243,6 +243,78 @@ public class BluetoothController implements Controller {
         }
 	}
 	
+	@Override
+	public void extendBoth() {
+		try {
+            connection.send(new MessageMoveTentacle(2,0).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message EXTEND BOTH -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message EXTEND BOTH -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void extendLeft() {
+		try {
+            connection.send(new MessageMoveTentacle(0,0).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message EXTEND LEFT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message EXTEND LEFT -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void extendRight() {
+		try {
+            connection.send(new MessageMoveTentacle(1,0).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message EXTEND RIGHT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message EXTEND RIGHT -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void retractBoth() {
+		try {
+            connection.send(new MessageMoveTentacle(2,1).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message RETRACT BOTH -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message RETRACT BOTH -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void retractLeft() {
+		try {
+            connection.send(new MessageMoveTentacle(0,1).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message RETRACT LEFT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message RETRACT LEFT -- invalid argument");
+        }
+	}
+	
+	@Override
+	public void retractRight() {
+		try {
+            connection.send(new MessageMoveTentacle(1,1).hash());
+        } catch (InvalidOpcodeException e) {
+            System.err.println("Failed to send message RETRACT RIGHT -- invalid opcode");
+        } catch (InvalidArgumentException e) {
+            System.err
+                    .println("Failed to send message RETRACT RIGHT -- invalid argument");
+        }
+	}
+	
 /*	@Override
 	public void gentleKick(int speed, int angle) {
 		// TODO Auto-generated method stub
