@@ -228,7 +228,7 @@ public class Kraken {
                                 -controller.getMaximumWheelSpeed(),
                                 -controller.getMaximumWheelSpeed());
                         drawMessage("Obstacle detected\nBacking up");
-                        Thread.sleep(100);
+                        Thread.sleep(150);
                         controller.stop();
                     }
 
@@ -238,7 +238,7 @@ public class Kraken {
                                 controller.getMaximumWheelSpeed(),
                                 controller.getMaximumWheelSpeed());
                         drawMessage("Obstacle detected\nForward!");
-                        Thread.sleep(100);
+                        Thread.sleep(150);
                         controller.stop();
                     }
                     
