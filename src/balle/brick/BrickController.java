@@ -52,7 +52,7 @@ public class BrickController implements Controller {
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
     private final int tentacleKickTime = 100;
-    private final int mainKickTime = 120;
+    private final int mainKickTime = 80;
 
     // The mux and its address
     private final I2CSensor MOTORMUX;
@@ -174,7 +174,7 @@ public class BrickController implements Controller {
                     MOTORMUX.sendData(kicker1Direction, forward);
                     MOTORMUX.sendData(kicker2Direction, forward);
                     
-                    Thread.sleep(mainKickTime - 80);
+                    Thread.sleep(mainKickTime - 60);
                 } catch (InterruptedException e) {
                     drawMessage("InterruptedException\nin kick");
                 } finally {
