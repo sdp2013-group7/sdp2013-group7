@@ -3,7 +3,6 @@ package balle.strategy;
 import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.strategy.planner.AbstractPlanner;
-import balle.strategy.planner.DribbleAndScore;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;

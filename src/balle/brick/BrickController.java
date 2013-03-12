@@ -55,7 +55,6 @@ public class BrickController implements Controller {
     private final int mainKickTime = 120;
 
     // The mux and its address
-    // TODO: Make the mux volatile? Is it necessary?
     private final I2CSensor MOTORMUX;
     private final int MUX_ADDRESS = 0xB4;
     
@@ -82,12 +81,6 @@ public class BrickController implements Controller {
     	
     	MOTORMUX = new I2CSensor(I2Cport);
     	MOTORMUX.setAddress(MUX_ADDRESS);
-    	
-    	// Register sweep
-    	// Sometimes refuses to work otherwise, documents say
-    	// the reason for this is unknown    	
-    	
-//    	registerSweep();
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
                 RIGHT_WHEEL, INVERSE_WHEELS);
