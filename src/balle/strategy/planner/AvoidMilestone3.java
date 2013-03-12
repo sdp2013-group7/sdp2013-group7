@@ -215,10 +215,17 @@ public class AvoidMilestone3 extends AbstractPlanner {
 
 				double angle1 = 90.0;
 				double angle2 = 270.0;
-				double minDist1 = distanceToClosestWall(
-						ourRobot.getFacingLine(), pitchSides, angle1);
-				double minDist2 = distanceToClosestWall(
-						ourRobot.getFacingLine(), pitchSides, angle2);
+				
+				Line faceLine = ourRobot.getFacingLine();
+				
+				Line customFaceLine1 = faceLine.rotateAroundPoint(
+						faceLine.getA(), new Orientation(angle1, false));
+				double minDist1 = ourRobot.distanceToFacingWall(customFaceLine1);
+				
+				Line customFaceLine2 = faceLine.rotateAroundPoint(
+						faceLine.getA(), new Orientation(angle2, false));
+				double minDist2 = ourRobot.distanceToFacingWall(customFaceLine2);
+				
 				if (minDist1 > minDist2) {
 					LOG.info("Rotating anti-clockwise.");
 					rotatingClockwise = false;
@@ -245,34 +252,6 @@ public class AvoidMilestone3 extends AbstractPlanner {
 		moving = true;
 		rotating = false;
 		controller.setWheelSpeeds(motorSpeed, motorSpeed);
-	}
-
-	public static double distanceToClosestWall(Line facingLine,
-			Line[] pitchSides, double rotationAngle) {
-
-		Coord startFaceLine = facingLine.getA();
-		double minDistance = -1;
-
-		Line side;
-		Coord endFaceLine;
-		Line distanceLine;
-
-		facingLine = facingLine.rotateAroundPoint(startFaceLine,
-				new Orientation(rotationAngle, false));
-
-		for (int i = 0; i < 4; i++) {
-
-			side = pitchSides[i];
-			endFaceLine = facingLine.getIntersect(side);
-
-			if (endFaceLine != null) {
-				distanceLine = new Line(startFaceLine, endFaceLine);
-				if (distanceLine.length() < minDistance || minDistance == -1)
-					minDistance = distanceLine.length();
-			}
-		}
-
-		return minDistance;
 	}
 
 	// To make it a usable stand-alone strategy
