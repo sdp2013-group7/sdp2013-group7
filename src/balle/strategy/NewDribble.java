@@ -78,20 +78,20 @@ public class NewDribble extends AbstractPlanner {
 				// Condition for our robot being in the upper part or the lower part of the pitch 
 				if (ourRobot.getPosition().getY()<0.6){
 					LOG.info("The goal is left and we are down.");
-	    			controller.setWheelSpeeds(-50,-100);
+	    			controller.setWheelSpeeds(-35,-70);
 				} else {
 					LOG.info("The goal is left and we are up");
-	    			controller.setWheelSpeeds(-100,-50);
+	    			controller.setWheelSpeeds(-70,-35);
 				}
 			} else{
 				
 				// Condition for our robot being in the upper part or the lower part of the pitch 
 				if (ourRobot.getPosition().getY()<0.6){
 					LOG.info("The goal is right and we are down.");
-	    			controller.setWheelSpeeds(-100,-50);
+	    			controller.setWheelSpeeds(-70,-35);
 				} else {
 					LOG.info("The goal is right and we are up");
-	    			controller.setWheelSpeeds(-50,-100);
+	    			controller.setWheelSpeeds(-35,-70);
 				}
 			}
 			

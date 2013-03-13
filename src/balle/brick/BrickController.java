@@ -76,10 +76,10 @@ public class BrickController implements Controller {
     
     public BrickController() {
 
-    	I2CPort I2Cport = SensorPort.S4; //Assign port
-    	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
+    	//I2CPort I2Cport = SensorPort.S4; //Assign port
+    	//I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
     	
-    	MOTORMUX = new I2CSensor(I2Cport);
+    	MOTORMUX = new I2CSensor(SensorPort.S4);
     	MOTORMUX.setAddress(MUX_ADDRESS);
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
