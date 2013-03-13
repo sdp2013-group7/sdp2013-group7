@@ -159,41 +159,29 @@ public class BrickController implements Controller {
 
         isKicking = true;
         
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MOTORMUX.sendData(kicker1Speed,kickSpeed);
-                    MOTORMUX.sendData(kicker2Speed,kickSpeed);
-                    
-                    MOTORMUX.sendData(kicker1Direction,forward);
-                    MOTORMUX.sendData(kicker2Direction,forward);
-                	
-                    Thread.sleep(mainKickTime);
-                    
-                    MOTORMUX.sendData(kicker1Direction, backward);
-                    MOTORMUX.sendData(kicker2Direction, backward);
-                    
-                    Thread.sleep(mainKickTime - 60);
-                } catch (InterruptedException e) {
-                    drawMessage("InterruptedException\nin kick");
-                } finally {
-                	MOTORMUX.sendData(kicker1Direction, off);
-                	MOTORMUX.sendData(kicker2Direction, off);
-                
-                	MOTORMUX.sendData(kicker1Speed, off);
-                	MOTORMUX.sendData(kicker2Speed, off);
-                	isKicking = false;
-                }
-            }
-        });
-        t.start();
         try {
-			t.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}        
+        	MOTORMUX.sendData(kicker1Speed,kickSpeed);
+        	MOTORMUX.sendData(kicker2Speed,kickSpeed);
+
+        	MOTORMUX.sendData(kicker1Direction,forward);
+        	MOTORMUX.sendData(kicker2Direction,forward);
+
+        	Thread.sleep(mainKickTime);
+
+        	MOTORMUX.sendData(kicker1Direction, backward);
+        	MOTORMUX.sendData(kicker2Direction, backward);
+
+        	Thread.sleep(mainKickTime - 60);
+        } catch (InterruptedException e) {
+        	drawMessage("InterruptedException\nin kick");
+        } finally {
+        	MOTORMUX.sendData(kicker1Direction, off);
+        	MOTORMUX.sendData(kicker2Direction, off);
+
+        	MOTORMUX.sendData(kicker1Speed, off);
+        	MOTORMUX.sendData(kicker2Speed, off);
+        	isKicking = false;
+        }
         
     }
 
