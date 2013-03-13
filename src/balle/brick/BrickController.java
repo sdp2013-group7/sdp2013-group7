@@ -76,10 +76,10 @@ public class BrickController implements Controller {
     
     public BrickController() {
 
-    	I2CPort I2Cport = SensorPort.S4; //Assign port
-    	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
+    	//I2CPort I2Cport = SensorPort.S4; //Assign port
+    	//I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
     	
-    	MOTORMUX = new I2CSensor(I2Cport);
+    	MOTORMUX = new I2CSensor(SensorPort.S4);
     	MOTORMUX.setAddress(MUX_ADDRESS);
     	
 		pilot = new LegacyPilot(WHEEL_DIAMETER, TRACK_WIDTH, LEFT_WHEEL,
@@ -162,6 +162,7 @@ public class BrickController implements Controller {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
+            	
                 try {
                     MOTORMUX.sendData(kicker1Speed,kickSpeed);
                     MOTORMUX.sendData(kicker2Speed,kickSpeed);

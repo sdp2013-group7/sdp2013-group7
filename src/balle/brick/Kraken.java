@@ -168,11 +168,10 @@ public class Kraken {
     public static void main(String[] args) {
     	
     	// Assign a port to the sensor multiplexer
-    	I2CPort I2Cport = SensorPort.S4;
-    	I2Cport.i2cEnable(I2CPort.STANDARD_MODE);
+    	SensorPort.S4.i2cEnable(I2CPort.STANDARD_MODE);
     	
     	// Set up the multiplexer
-    	SENSORMUX = new I2CSensor(I2Cport);
+    	SENSORMUX = new I2CSensor(SensorPort.S4);
     	SENSORMUX.setAddress(MUX_ADDRESS);
     	byte[] sensorBuffer = new byte[1];
     	
