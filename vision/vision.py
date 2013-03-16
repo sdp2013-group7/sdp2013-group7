@@ -4,7 +4,7 @@ import os
 import time
 import math
 import socket
-import cv
+# import cv
 
 from optparse import OptionParser
 
@@ -29,7 +29,12 @@ class Vision:
                
         self.running = True
         self.connected = False
-        
+        self.yellow_list = []
+        self.blue_list = []
+        self.blue_disregarded = []
+        self.blue_was_dis_ago = 0
+        self.yellow_was_dis_ago = 0
+        self.yellow_disregarded = []
         self.stdout = stdout 
 
         if sourcefile is None:  
@@ -106,6 +111,12 @@ class Vision:
 
         self.gui.loop()
 
+    def deltaDeg(self, fromDeg, toDeg):
+        delta = abs(fromDeg - toDeg)
+        if (delta > 180):
+            delta = abs(delta - 360)
+        return delta
+
     def setNextPitchCorner(self, where):
         self.preprocessor.setNextPitchCorner(where)
         
@@ -141,8 +152,97 @@ class Vision:
             if name == 'ball':
                 self.send('{0} {1} '.format(x, y))
             else:
-                angle = 360 - (((entity.angle() * (180/math.pi)) - 360) % 360)
-                self.send('{0} {1} {2} '.format(x, y, angle))
+                angle = 360 - (((entity.angle() * (180 / math.pi)) - 360) % 360)
+                #Check if we're dealing for the yello plate
+                if name == "yellow":
+                    #If we have a full list of 10 recorded angles, pop the oldest one.
+                    if len(self.yellow_list) == 5:
+                        self.yellow_list.pop(0)
+                    #If we don't have an angle yet (first frame of the vision) then take the first one for reliable.
+                    if len(self.yellow_list) == 0:
+                        # print ("APPENDIN")
+                        self.yellow_list.append(angle)
+                    #Calculate the mean of the list of angles
+                    mean_angle = reduce(lambda x, y: x + y, self.yellow_list) / len(self.yellow_list)
+                    #Calculate the standart deviation
+                    std = math.sqrt(math.fabs(self.deltaDeg(angle, mean_angle)))
+                    # print ("Standart dev is ")
+                    # print (std)
+                    # print ("^^^^^^^^^^^^^^^^^")
+                    # print ("The mean angle is")
+                    # print (mean_angle)
+                    # print ("The length of the array")
+                    # print (len(self.yellow_list))
+                    #Check if the new angle is too far away. If it is then add it to a disregard list and increment the disregarded ago counter.
+                    if std < 6:
+                        # print("STD < 6 BECAUSE IT's")
+                        # print(std)
+                        if(len(self.yellow_list) < 5):
+                            self.yellow_list.append(angle)
+                        mean_angle = reduce(lambda x, y: x + y, self.yellow_list) / len(self.yellow_list)
+                        # print (mean_angle)
+                        self.yellow_was_dis_ago = self.yellow_was_dis_ago + 1
+                    #If the vision craps itself then we check if we have 10 consequitive disregards and if so, we take them for the current direction.
+                    elif (self.yellow_was_dis_ago == 0 and len(self.yellow_disregarded) == 5):
+                        # print ("Hit the fix it case")
+                        #This is the case in which we have gotten too many disregarded values, and it was soon.
+                        #In this case we need to swap the values and try again
+                        self.yellow_list = self.yellow_disregarded
+                        self.yellow_disregarded = []
+                        self.yellow_was_dis_ago = self.yellow_was_dis_ago + 1
+                        # print (self.yellow_disregarded)
+                        # print (self.yellow_list)
+                    #Disregard case
+                    else:
+                        # print ("DISREGARDED")
+                        self.yellow_disregarded.append(angle)
+                        self.yellow_was_dis_ago = 0
+                elif name == "blue":
+                    #If we have a full list of 10 recorded angles, pop the oldest one.
+                    if len(self.blue_list) == 5:
+                        self.blue_list.pop(0)
+                    #If we don't have an angle yet (first frame of the vision) then take the first one for reliable.
+                    if len(self.blue_list) == 0:
+                         print ("APPENDIN")
+                         self.blue_list.append(angle)
+                    #Calculate the mean of the list of angles
+                    mean_angle = reduce(lambda x, y: x + y, self.blue_list) / len(self.blue_list)
+                    #Calculate the standart deviation
+                    std = math.sqrt(math.fabs(self.deltaDeg(angle, mean_angle)))
+                    print ("Standart dev is ")
+                    print (std)
+                    print ("^^^^^^^^^^^^^^^^^")
+                    print ("The mean angle is")
+                    print (mean_angle)
+                    print ("The length of the array")
+                    print (len(self.blue_list))
+                    #Check if the new angle is too far away. If it is then add it to a disregard list and increment the disregarded ago counter.
+                    if std < 6:
+                        print("STD < 6 BECAUSE IT's")
+                        print(std)
+                        if(len(self.blue_list) < 5):
+                            self.blue_list.append(angle)
+                        mean_angle = reduce(lambda x, y: x + y, self.blue_list) / len(self.blue_list)
+                        print (mean_angle)
+                        self.blue_was_dis_ago = self.blue_was_dis_ago + 1
+                    #If the vision craps itself then we check if we have 10 consequitive disregards and if so, we take them for the current direction.
+                    elif (self.blue_was_dis_ago == 0 and len(self.blue_disregarded) == 5):
+                        print ("Hit the fix it case")
+                        #This is the case in which we have gotten too many disregarded values, and it was soon.
+                        #In this case we need to swap the values and try again
+                        self.blue_list = self.blue_disregarded
+                        self.blue_disregarded = []
+                        self.blue_was_dis_ago = self.blue_was_dis_ago + 1
+                        print (self.blue_disregarded)
+                        print (self.blue_list)
+                    #Disregard case
+                    else:
+                        print ("DISREGARDED")
+                        self.blue_disregarded.append(angle)
+                        self.blue_was_dis_ago = 0
+                 
+
+                self.send('{0} {1} {2} '.format(x, y, mean_angle))
 
         self.send(str(int(time.time() * 1000)) + " \n")
         
