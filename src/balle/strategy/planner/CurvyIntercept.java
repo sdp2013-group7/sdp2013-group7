@@ -1,6 +1,11 @@
 package balle.strategy.planner;
 
 import java.awt.Color;
+import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+
+import android.util.Log;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -10,11 +15,13 @@ import balle.controller.Controller;
 import balle.main.drawable.DrawableRectangularObject;
 import balle.strategy.ConfusedException;
 import balle.strategy.FactoryMethod;
+import balle.strategy.Interception;
 import balle.strategy.Strategy;
 import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
+import balle.world.objects.CircularBuffer;
 import balle.world.objects.Pitch;
 import balle.world.objects.Point;
 import balle.world.objects.RectangularObject;
@@ -22,9 +29,11 @@ import balle.world.objects.Robot;
 
 public class CurvyIntercept extends AbstractPlanner {
 	
-	Strategy GO;
+	private boolean hasMoved = false;
+	private ArrayList<Coord> ballbuff = new ArrayList<>();
 	private MovementExecutor movementExecutor;
 	private OrientedMovementExecutor orientedMovementExecutor;
+	private static Logger LOG  = Logger.getLogger(CurvyIntercept.class);
 
 	
     public CurvyIntercept(MovementExecutor movementExecutor,OrientedMovementExecutor orientedMovementExecutor) {
@@ -38,7 +47,18 @@ public class CurvyIntercept extends AbstractPlanner {
                 new SimplePathFinder(
                 new CustomCHI())));
     }
-
+    
+    
+    public boolean hasBallMoved(){
+    	int n = ballbuff.size();
+    	if (n>=2){
+    		
+    		return hasMoved||(ballbuff.get(n-1).abs()!=ballbuff.get(n-2).abs());
+    		
+    	}else 
+    		return hasMoved;
+    	
+    }
 
 	///////////////////////////////////////ON STEP///////////////////////////////////
 	
@@ -63,38 +83,45 @@ public class CurvyIntercept extends AbstractPlanner {
 		if (ourRobot.getPosition() == null) 
 			return;
 		
-		// Check for opponent position. If it is on left side then we need to intercept
-		//towards right. Else towards left.
-		if (opponent.getPosition().getX() >= 1.2){
-			pitchLine = pitch.getBottomWall();
-			goalRect = pitchLine.widen(0.2);
-			pitchLine = goalRect.getRightSide();
+		
+		ballbuff.add(ball.getPosition());
+		
+		if (hasBallMoved()){
 			
-		}else {
-			pitchLine = pitch.getTopWall();
-			goalRect = pitchLine.widen(0.2);
-			pitchLine = goalRect.getLeftSide();
+		//	if (opponentLine.) 
+			// Check for opponent position. If it is on left side then we need to intercept
+			//towards right. Else towards left.
+			if (opponent.getPosition().getX() >= 1.2){
+				pitchLine = pitch.getBottomWall();
+				goalRect = pitchLine.widen(0.4);
+				pitchLine = goalRect.getRightSide();
+				
+			}else {
+				pitchLine = pitch.getTopWall();
+				goalRect = pitchLine.widen(0.4);
+				pitchLine = goalRect.getLeftSide();
+				
+			}
+			// Draw the rectangular object that is used for the intercept.	
+			addDrawable(new DrawableRectangularObject(goalRect, Color.MAGENTA));
 			
+			Coord target = opponentLine.getIntersect(pitchLine);
+			
+			if (movementExecutor != null) {
+	            movementExecutor.updateTarget(new Point(target));
+	            addDrawables(movementExecutor.getDrawables());
+	            movementExecutor.step(controller, snapshot);
+	
+	        } else if (orientedMovementExecutor != null) {
+	            orientedMovementExecutor.updateTarget(new Point(target),
+	                    snapshot.getOpponentsGoal().getGoalLine().midpoint()
+	                            .sub(target).orientation());
+	            addDrawables(orientedMovementExecutor.getDrawables());
+	            orientedMovementExecutor.step(controller, snapshot);
+	
+	        }
 		}
-		// Draw the rectangular object that is used for the interception	
-		addDrawable(new DrawableRectangularObject(goalRect, Color.MAGENTA));
-		
-		Coord target = opponentLine.getIntersect(pitchLine);
-		
-		if (movementExecutor != null) {
-            movementExecutor.updateTarget(new Point(target));
-            addDrawables(movementExecutor.getDrawables());
-            movementExecutor.step(controller, snapshot);
-
-        } else if (orientedMovementExecutor != null) {
-            orientedMovementExecutor.updateTarget(new Point(target),
-                    snapshot.getOpponentsGoal().getGoalLine().midpoint()
-                            .sub(target).orientation());
-            addDrawables(orientedMovementExecutor.getDrawables());
-            orientedMovementExecutor.step(controller, snapshot);
-
-        }
-    } 
+	} 
 
 
 }
