@@ -17,40 +17,47 @@ import balle.world.objects.Robot;
 public class Intercept extends AbstractPlanner {
 
 	private static Logger LOG = Logger.getLogger(DribbleAndScore.class);
+	
 	// Strategy
 	private Strategy interceptStrategy;
 
+	// Flag that is set if there is nothing else to do
 	private boolean done = false;
-
-	// Our robot and ball
+	
+	// Pitch
+	private Pitch pitch;
+	
+	// Robots and ball
 	private Robot ourRobot;
+	private Robot otherRobot;
 	private Ball ball;
 	
-	private Coord robotPosition;
-	
-	// Positions of our robot and ball
+	// Positions of robots and ball
+	private Coord ourPosition;
+	private Coord otherPosition;
 	private Coord ballPosition;
-
-	// Start position of the ball
-	private Coord originalBallPosition;
-
 	
-
-
-
-	// Pitch
-	private Line[] pitchSides = new Line[4];
+	// Records ball position when it moves at least 3cm
+	private Coord lastBallPosition;
+	
+	// The ball's direction (if ball is moving) or the other robot's 
+	// facing line otherwise
+	private Line referenceLine;
+	
+	// Do we need to get in front of the ball? 
+	private Boolean rotateToReferenceLine = false;
+	
+	private Boolean moving = false;
+	
+	private Orientation targetOrientation;
+	
+	private boolean ballMoved = false;
+	
+	
 
 	public Intercept() {
 
 		interceptStrategy = new GoToBallSafeProportional();
-
-		double pitchWidth = 1.22;
-		double pitchLength = 2.44;
-		pitchSides[0] = new Line(0, 0, 0, pitchWidth);
-		pitchSides[1] = new Line(pitchLength, 0, pitchLength, pitchWidth);
-		pitchSides[2] = new Line(0, pitchWidth, pitchLength, pitchWidth);
-		pitchSides[3] = new Line(0, 0, pitchLength, 0);
 
 	}
 
@@ -68,62 +75,241 @@ public class Intercept extends AbstractPlanner {
 			return;
 		}
 		
-		Pitch pitch = snapshot.getPitch();
-		Robot opponent = snapshot.getOpponent();
+		// Get pitch
+		pitch = snapshot.getPitch();
+		
+		// Get robots and ball
 		ourRobot = snapshot.getBalle();
+		otherRobot = snapshot.getOpponent();
 		ball = snapshot.getBall();
 		
-		// Get positions of our robot and ball
-		robotPosition = ourRobot.getPosition();
+		// Get positions of robots and ball
+		ourPosition = ourRobot.getPosition();
+		otherPosition = otherRobot.getPosition();
 		ballPosition = ball.getPosition();
 
-		// Check if robot is actually on the pitch
-		if (ourRobot.getPosition() == null) {
+		// Check if our robot is actually on the pitch
+		if (ourPosition == null) {
 			LOG.info("Where am I? :(");
 			return;
 		}
 		
-		if (opponent.getPosition() == null) {
+		// Check if other robot is actually on the pitch
+		if (otherPosition == null) {
 			LOG.info("Where is enemy? :(");
 			return;
 		}
 		
 		// Check if ball is actually on the pitch
-		if (ball.getPosition() == null) {
+		if (ballPosition == null) {
 			LOG.info("Where is ball? :(");
 			return;
 		}
+		
+		// Set the previously recorded ball position for the first time
+		if (lastBallPosition == null)
+			lastBallPosition = ballPosition;
+		
+		// If the reference line is not yet the ball direction, set it to be
+		// the other robot's facing line
+		if (referenceLine == null)
+			referenceLine = otherRobot.getFacingLine();
+		
+		// Update the reference line if the ball has moved at least 3cm
+		if (ballPosition.dist(lastBallPosition) > 0.03) {
+			
+			ballMoved = true;
+			
+			double referenceSlope = (ballPosition.y - lastBallPosition.y)/(ballPosition.x - lastBallPosition.x);
+			double referenceIntercept = ballPosition.y - (referenceSlope*ballPosition.x);
+			
+			double newX;
+			double newY;
+			
+			if (ballPosition.x > lastBallPosition.x)
+				newX = ballPosition.x + 3;
+			else
+				newX = 0;
+			
+			newY = (referenceSlope*newX) + referenceIntercept;
+				
+			referenceLine = new Line(lastBallPosition, new Coord(newX, newY));
+			lastBallPosition = ballPosition;
+		}
+		
+		if (moving) {
+			if (referenceLine.dist(ourPosition) < 0.25) {
+				controller.stop();
+				moving = false;
+				done = true;
+				return;
+			}
+		}
+		
+		if (rotateToReferenceLine) {
+			
+			double ourOrientation = ((ourRobot.getOrientation().degrees() % 180) + 180) % 180;
+			double targetOrientationModulo = ((targetOrientation.degrees() % 180) + 180) % 180;
 
-		if (opponent.getPosition().x >= 1.2){
-
-			Line pitchMidLine = pitch.getBottomWall();
-			Coord target = opponent.getFacingLine().getIntersect(pitchMidLine);
-	
-			if (target == null){
-				LOG.info("target is null");
+			if (Math.abs(ourOrientation - targetOrientationModulo) < 5) {
+				if (ballMoved) {
+					rotateToReferenceLine = false;
+					moving = true;
+					controller.setWheelSpeeds(600, 600);
+				}
+				else 
+					controller.stop();
 				return;
 			}
 			
-			Line targetLine = new Line (target, ourRobot.getPosition());
+		}
+		
+		if (!moving && !rotateToReferenceLine) {
 			
+			// The point we should go towards, i.e. closest point on
+			// reference line to our robot's position
+			Coord target = referenceLine.closestPoint(ourPosition);
+			
+			// We want our robot's facing line to have the same direction
+			// as the line from our robot's centre to the target
+			Line targetLine = new Line (ourPosition, target);
+			
+			// The orientation we want to achieve is the same as targetLine's orientation
+			targetOrientation = targetLine.angle();
+			
+			if (referenceLine.dist(ourPosition) < 0.05) {
+				done = true;
+				return;
+			}
+			
+			else if (Math.abs(ourRobot.getOrientation().degrees() - targetOrientation.degrees()) < 45
+					|| Math.abs((ourRobot.getOrientation().degrees() + 360) - targetOrientation.degrees()) < 45
+					|| Math.abs(ourRobot.getOrientation().degrees() - (targetOrientation.degrees() + 360)) < 45) {
+				if (ballMoved) {
+				
+					controller.setWheelSpeeds(600, 600);
+					moving = true;
+				}
+				return;
+			}
+			
+			else {
+				// Get the orientation we should turn in order to achieve that orientation
+				double orientationToTurn = ourRobot.getAngleToTurn(targetOrientation);
+
+				controller.rotate((int)Math.toDegrees(orientationToTurn), 80);
+
+				return;
+			}
+		}
+		
+		if (moving) 
+			return;
+		
+		 {
+			LOG.info("here");
+
+		}
+		
+		
+
+
+		// If we should rotate towards the reference line
+		if (false){
+			// The point we should go towards, i.e. closest point on
+			// reference line to our robot's position
+			Coord target = referenceLine.closestPoint(ourPosition);
+			
+			// We want our robot's facing line to have the same direction
+			// as the line from our robot's centre to the target
+			Line targetLine = new Line (target, ourPosition);
+			
+			// The orientation we want to achieve is the same as targetLine's orientation
 			Orientation targetOrientation = targetLine.angle();
-
-
-
+			
+			// Get the orientation we should turn in order to achieve that orientation
 			double orientationToturn = ourRobot.getAngleToTurn(targetOrientation);
 
-			LOG.info("rotating " +orientationToturn);
-		
-			controller.rotate(-(int)Math.toDegrees(orientationToturn), 15);
 
-			if (Math.abs(ourRobot.getOrientation().degrees() - targetOrientation.degrees()) <5)
-				controller.setWheelSpeeds(50, 50);
-		}		
+			
+			double ourOrientation = ((ourRobot.getOrientation().degrees() % 180) + 180) % 180;
+			double targetOrientationModulo = ((targetOrientation.degrees() % 180) + 180) % 180;
+
+			if (Math.abs(ourOrientation - targetOrientationModulo) < 5) {
+				if (ballMoved) {
+					rotateToReferenceLine = false;
+					controller.setWheelSpeeds(600, 600);
+				}
+				return;
+			}
+			
+//			if (Math.abs(ourRobot.getOrientation().degrees() - targetOrientation.degrees()) < 5) {
+//				rotateToReferenceLine = false;
+//				controller.setWheelSpeeds(200, 200);
+//				return;
+//			}
+			
+			else
+				controller.rotate(-(int)Math.toDegrees(orientationToturn), 30);
+			
+			return;
+			
+		}
+		
+
+		
+//		if (rotateBackToBall == true) {
+//			Line targetLine = new Line (referenceLine.getB(), referenceLine.getA());
+//			Orientation targetOrientation = targetLine.angle();
+//
+//
+//
+//			double orientationToturn = ourRobot.getAngleToTurn(targetOrientation);
+//
+//
+//			
+//			//double ourOrientation = ((ourRobot.getOrientation().degrees() % 180) + 180) % 180;
+//			//double targetOrientationModulo = ((targetOrientation.degrees() % 180) + 180) % 180;
+//			
+//			LOG.info("Our " + ourRobot.getOrientation().degrees());
+//			LOG.info("Opponent " + targetOrientation.degrees());
+//
+//			if (Math.abs(ourRobot.getOrientation().degrees() - targetOrientation.degrees()) < 5) {
+//				done = true;
+//				controller.stop();
+//				return;
+//			}
+//			
+//			else
+//				controller.rotate((int)Math.toDegrees(orientationToturn), 30);
+//			
+//			return;
+//			
+//		}
+//		
+//		else {
+//			double distanceToReference = referenceLine.dist(ourPosition);
+//			
+//			if (distanceToReference < 0.25) {
+//				rotateBackToBall = true;
+//			}
+//		}
 	}
-		
-		
-// COMPUTE POINT WHERE BALL WILL STOP. 
-// DON'T NEED FOR THE MOMENT
+
+	// To make it a usable stand-alone strategy
+	@FactoryMethod(designator = "Intercept", parameterNames = {})
+	public static Intercept factoryMethod() {
+		return new Intercept();
+	}
+}
+
+
+
+
+
+
+//COMPUTE POINT WHERE BALL WILL STOP. 
+//DON'T NEED FOR THE MOMENT
 //	
 //
 //	if (originalBallPosition == null) {
@@ -184,11 +370,3 @@ public class Intercept extends AbstractPlanner {
 //		
 //		if (ballStopPoint != null)
 //			addDrawable(new Dot(ballStopPoint, Color.BLACK));
-
-
-	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Intercept", parameterNames = {})
-	public static Intercept factoryMethod() {
-		return new Intercept();
-	}
-}
