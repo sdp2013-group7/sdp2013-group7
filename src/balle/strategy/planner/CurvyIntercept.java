@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import android.util.Log;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.MovementExecutor;
@@ -30,7 +29,7 @@ import balle.world.objects.Robot;
 public class CurvyIntercept extends AbstractPlanner {
 	
 	private boolean hasMoved = false;
-	private ArrayList<Coord> ballbuff = new ArrayList<>();
+	private ArrayList<Coord> ballbuff = new ArrayList<Coord>();
 	private MovementExecutor movementExecutor;
 	private OrientedMovementExecutor orientedMovementExecutor;
 	private static Logger LOG  = Logger.getLogger(CurvyIntercept.class);
