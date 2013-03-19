@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
+import balle.strategy.executor.movement.GoToObjectPFN;
 import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.executor.movement.OrientedMovementExecutor;
+import balle.strategy.pathFinding.ForwardAndReversePathFinder;
+import balle.strategy.pathFinding.PathFinder;
 import balle.strategy.pathFinding.SimplePathFinder;
 import balle.controller.Controller;
 import balle.main.drawable.DrawableLine;
@@ -31,18 +34,30 @@ public class CurvyIntercept extends AbstractPlanner {
 	private MovementExecutor movementExecutor;
 	private OrientedMovementExecutor orientedMovementExecutor;
 	private static Logger LOG  = Logger.getLogger(CurvyIntercept.class);
-
-	
+	private boolean done = false;
+	/*
     public CurvyIntercept(MovementExecutor movementExecutor,OrientedMovementExecutor orientedMovementExecutor) {
     	this.movementExecutor = movementExecutor;
         this.orientedMovementExecutor = orientedMovementExecutor;
     }
-
+    */
+/*
     @FactoryMethod(designator = "Curvy Intercept Strategy", parameterNames = {})
     public static final CurvyIntercept factoryNCPBZR() {
 		return new CurvyIntercept (null, new BezierNav(
-                new SimplePathFinder(
-                new CustomCHI())));
+				new SimplePathFinder(
+				new CustomCHI())));
+    }
+    */
+	
+	 public CurvyIntercept(MovementExecutor movementExecutor) {
+	    	this.movementExecutor = movementExecutor;
+	        
+	    }
+	   
+    @FactoryMethod(designator = "Curvy Intercept Strategy", parameterNames = {})
+    public static final CurvyIntercept factoryMethod() {
+		return new CurvyIntercept ( new GoToObjectPFN(0));
     }
     
     protected void setIAmDoing(String message) {
@@ -58,11 +73,20 @@ public class CurvyIntercept extends AbstractPlanner {
     	return hasMoved;
     	
     }
+   
+    @Override
+    public void stop(Controller controller) {
+    	movementExecutor.stop(controller);
+    	controller.kick();
+    	LOG.info("Just so you know I just kicked your ass!");
+    	controller.stop();
 
-	///////////////////////////////////////ON STEP///////////////////////////////////
-	
-	
-	
+    }
+
+    
+    
+    ///////////////////////////////////////ON STEP///////////////////////////////////
+		
 	
 	
 	@Override
@@ -73,24 +97,31 @@ public class CurvyIntercept extends AbstractPlanner {
 		Pitch pitch = snapshot.getPitch();
 		Robot opponent = snapshot.getOpponent();
 		Robot ourRobot = snapshot.getBalle();		
-		Line opponentLine = opponent.getFacingLine();
+		
 		Line pitchLine;
 		RectangularObject goalRect;
 		double distance = 0;
 		Coord target;
-		Orientation ball_orientation;
+		double angle;
 		Line interceptLine;
 		int n;
 		
+		if (done){
+			stop(controller);
+		}
 		// Dummy 
 		if (ball.getPosition() == null)
 			return;
 		if (ourRobot.getPosition() == null) 
 			return;
+		if (opponent.getPosition() == null) 
+			return;
 		
 		// Ball buffer.
 		ballbuff.add(ball.getPosition());
 		n = ballbuff.size();
+		angle = ourRobot.getAngleToTurnToTarget(ball.getPosition());
+		angle = Math.toDegrees(angle) / 2;
 		
 		// Check for opponent position. If it is on left side then we need to intercept
 		//towards right. Else towards left.
@@ -98,8 +129,7 @@ public class CurvyIntercept extends AbstractPlanner {
 			pitchLine = pitch.getBottomWall();
 			goalRect = pitchLine.widen(0.5);
 			pitchLine = goalRect.getRightSide();
-			
-			
+					
 		}else {
 			pitchLine = pitch.getTopWall();
 			goalRect = pitchLine.widen(0.5);
@@ -111,55 +141,47 @@ public class CurvyIntercept extends AbstractPlanner {
 		addDrawable(new DrawableRectangularObject(goalRect, Color.MAGENTA));
 		
 		
-		if (n>2){
-			interceptLine=(new Line (ballbuff.get(n-2),ballbuff.get(n-1)));
-			interceptLine=interceptLine.extendBothDirections(1);
 		
-		} else{
-			interceptLine = opponentLine;
-		}
-		addDrawable(new DrawableLine(interceptLine, Color.MAGENTA));
 		
 		// If ball has moved intercept
 		if (hasBallMoved()){
 			
-			distance=opponentLine.closestPoint(ball.getPosition()).dist(ball.getPosition());
-			
+			interceptLine=(new Line (ballbuff.get(n-2),ballbuff.get(n-1)));
+			interceptLine=interceptLine.extendBothDirections(2);
+			addDrawable(new DrawableLine(interceptLine, Color.MAGENTA));
+		
 			if (interceptLine.intersects(pitchLine)){
 				
 				setIAmDoing("Intercepting!");
+				addDrawable(new DrawableLine(interceptLine, Color.MAGENTA));
+				target = interceptLine.getIntersect(pitchLine);
 				
-				// If the ball has varied off to much take its line of movement as a target.
-				if (distance<0.01){ 
-					target = opponentLine.getIntersect(pitchLine);
 				
-				} else {
-					target = interceptLine.getIntersect(pitchLine);
+				if (ourRobot.getPosition().dist(target)<0.1){
+					setIAmDoing("Adjusting towards ball!");
+					
+					if (angle > 10 || angle < -10) {
+						controller.dribblersOn();
+						LOG.info("Dribblers on");
+						controller.rotate((int) angle, 50);
+						LOG.info("Angle: " + (int) angle);
+					} else {
+						stop(controller);
+					}
+					
+				}else{
+					if (movementExecutor != null) {
+						movementExecutor.updateTarget(new Point(target));
+						addDrawables(movementExecutor.getDrawables());
+						movementExecutor.step(controller, snapshot);
+					}
 				}
+					
+					
 				
-				ball_orientation =target.sub(snapshot.getBalle().getPosition()).getOrientation();
-				//addDrawable(new DrawableLine(ball_orientation, Color.BLUE));
-				//LOG.info(ball.getPosition().sub(ourRobot.getPosition()).getOrientation());
-				
-				if (movementExecutor != null) {
-			            movementExecutor.updateTarget(new Point(target));
-			            addDrawables(movementExecutor.getDrawables());
-			            movementExecutor.step(controller, snapshot);
-			
-			    } else if (orientedMovementExecutor != null) {
-			            orientedMovementExecutor.updateTarget(new Point(target),
-			            		ball_orientation
-			            		);
-			            addDrawables(orientedMovementExecutor.getDrawables());
-			            orientedMovementExecutor.step(controller, snapshot);
-			
-			    }
-			    
-				if (orientedMovementExecutor.isFinished(snapshot)){
-					setIAmDoing("done");
-				}
 			} else {
 				setIAmDoing("Interception Point outside of pitch!");
+				stop(controller);
 			}
 			
 		} else {
