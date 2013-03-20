@@ -41,11 +41,11 @@ public class InterceptM4 extends AbstractPlanner {
 	private Line referenceLine;
 
 	private Boolean moving = false;
-	private boolean dribbleAndScore = false;
+	private boolean rotated = false;
 	private Orientation targetOrientation;
 
 	public InterceptM4() {
-		interceptStrategy = new NavigateMilestone2();
+		interceptStrategy = new GoToBallSafeProportional();
 	}
 
 	@Override
@@ -84,6 +84,9 @@ public class InterceptM4 extends AbstractPlanner {
 			LOG.info("Where is ball? :(");
 			return;
 		}
+		
+		if (lastBallPosition == null)
+			lastBallPosition = ballPosition;
 
 		// If the reference line is not yet the ball direction, set it to be
 		// the other robot's facing line
@@ -91,21 +94,25 @@ public class InterceptM4 extends AbstractPlanner {
 			referenceLine = opponentRobot.getFacingLine();
 		}
 
-		if (!moving && !dribbleAndScore) {
-			if (Math.abs(ourRobot.getOrientation().degrees()
-					- targetOrientation.degrees()) < 45
-					|| Math.abs((ourRobot.getOrientation().degrees() + 360)
-							- targetOrientation.degrees()) < 45
-					|| Math.abs(ourRobot.getOrientation().degrees()
-							- (targetOrientation.degrees() + 360)) < 45) {
+		if (!rotated) {
+			double angle = ourRobot.getAngleToTurnToTarget(opponentPosition);
 
-				// controller.setWheelSpeeds(600, 600);
-				moving = true;
-				return;
-			}
+			// convert to degrees
+			angle = Math.toDegrees(angle);
+			
+			controller.rotate((int) angle, 150);
+			LOG.info("Angle: " + (int) angle);
+			
+			rotated = true;
+			return;
+			
 		}
 		
-		if (moving) {
+		if (ballPosition.dist(lastBallPosition) > 0.01) {
+			moving = true;
+		}
+
+		if (moving && rotated) {
 			interceptStrategy.step(controller, snapshot);
 		}
 	}
