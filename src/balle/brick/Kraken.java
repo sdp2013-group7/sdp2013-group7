@@ -20,6 +20,9 @@ class ListenerThread extends Thread {
     boolean         shouldStop;
     int             command;
     boolean         commandConsumed;
+    int				missedCommands;
+    int				commandsSinceRead;
+    int 			totalCommandsReceived;
 
     ListenerThread(DataInputStream input) {
         this.input = input;
@@ -41,17 +44,29 @@ class ListenerThread extends Thread {
     }
 
     private synchronized void setCommand(int command) {
+    	commandsSinceRead++;
+    	totalCommandsReceived++;
         this.command = command;
         commandConsumed = false;
     }
 
     public synchronized int getCommand() {
+    	missedCommands += commandsSinceRead-1;
+    	commandsSinceRead = 0;
         commandConsumed = true;
         return command;
     }
 
     public synchronized boolean available() {
         return !commandConsumed;
+    }
+    
+    public synchronized int getMissed() {
+    	return missedCommands;
+    }
+    
+    public synchronized int getAll() {
+    	return totalCommandsReceived;
     }
 
     public void cancel() {
@@ -195,7 +210,7 @@ public class Kraken {
             DataInputStream input = connection.openDataInputStream();
             ListenerThread listener = new ListenerThread(input);
 
-            Controller controller = new BrickController();
+            BrickController controller = new BrickController();
             MessageDecoder decoder = new MessageDecoder();
 
             listener.start();
@@ -255,7 +270,7 @@ public class Kraken {
                         break;
                     }
                     String name = message.getName();
-                    drawMessage(name);
+                    //drawMessage(name);
 
                     boolean successful = processMessage(message, controller);
                     if (!successful) {
@@ -263,6 +278,10 @@ public class Kraken {
                                 + hashedMessage);
                         Thread.sleep(10000);
                         break;
+                    }
+                    
+                    if(name.equals("STOP")) {
+                    	drawMessage(listener.getMissed() + "\n" + listener.getAll());
                     }
 
                 } catch (Exception e1) {
@@ -272,7 +291,11 @@ public class Kraken {
             }
 
             connection.close();
+            controller.muxOff();
+
         }
+        
+        
     }
 
     private static void drawMessage(String message) {

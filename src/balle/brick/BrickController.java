@@ -51,7 +51,11 @@ public class BrickController implements Controller {
     private volatile boolean isLeftKicking = false;
     private volatile boolean isRightKicking = false;
     private volatile boolean areSidesKicking = false;
-    private final int tentacleKickTime = 100;
+    private boolean areSidesExtended = false;
+    private boolean isLeftExtended = false;
+    private boolean isRightExtended = false;
+    private final int tentacleKickTime = 75;
+    private final int tentacleExtTime = 40;
     private final int mainKickTime = 80;
 
     // The mux and its address
@@ -63,6 +67,7 @@ public class BrickController implements Controller {
     private final byte forward = (byte) 1;
     private final byte backward = (byte) 2;
     private final byte off = (byte) 0;
+    private final byte lowPower = (byte) 20;
     
     // Constants for the mux registers
     private final int kicker1Direction = 0x01;
@@ -98,6 +103,17 @@ public class BrickController implements Controller {
 //        KICKER.smoothAcceleration(false);
 //        KICKER.regulateSpeed(false);
 
+    }
+    
+    void muxOff() {
+    	MOTORMUX.sendData(kicker1Speed,off);
+    	MOTORMUX.sendData(kicker2Speed,off);
+    	MOTORMUX.sendData(tentacleRightSpeed,off);
+    	MOTORMUX.sendData(tentacleLeftSpeed,off);
+    	MOTORMUX.sendData(kicker1Direction,off);
+    	MOTORMUX.sendData(kicker2Direction,off);
+    	MOTORMUX.sendData(tentacleRightDirection,off);
+    	MOTORMUX.sendData(tentacleLeftDirection,off);
     }
     
     void registerSweep() {
@@ -336,31 +352,24 @@ public class BrickController implements Controller {
 		isLeftKicking = true;		
 
         // TODO: Get the timings right.
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
-                    MOTORMUX.sendData(tentacleLeftDirection,backward);
-                    
-                    Thread.sleep(tentacleKickTime);
-                    
-                    MOTORMUX.sendData(tentacleLeftDirection, off);
 
-                    Thread.sleep(2000);
-                    
-                    MOTORMUX.sendData(tentacleLeftDirection, forward);
+		try {
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,backward);
 
-                	Thread.sleep(tentacleKickTime);
-                } catch (InterruptedException e) {
-                    drawMessage("InterruptedException\nin kickLeft");
-                } finally {
-                	MOTORMUX.sendData(tentacleLeftDirection, off);
-                	MOTORMUX.sendData(tentacleLeftSpeed, off);
-                	isLeftKicking = false;
-                }
-            }
-        }).start();
+			Thread.sleep(tentacleKickTime);
+
+			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleLeftDirection, forward);
+
+			Thread.sleep(tentacleKickTime);
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin kickLeft");
+		} finally {
+//			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			isLeftKicking = false;
+		}
 		
 	}
 	
@@ -374,27 +383,22 @@ public class BrickController implements Controller {
 		isRightKicking = true;
 
         // TODO: Get the timings right.
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
-                    MOTORMUX.sendData(tentacleRightDirection,forward);
-                    
-                    Thread.sleep(tentacleKickTime);
-                    
-                    MOTORMUX.sendData(tentacleRightDirection,backward);
-                    
-                    Thread.sleep(tentacleKickTime);                                       
-                } catch (InterruptedException e) {
-                    drawMessage("InterruptedException\nin kickRight");
-                } finally {
-                    MOTORMUX.sendData(tentacleRightDirection, off);
-                    MOTORMUX.sendData(tentacleRightSpeed, off);
-                    isRightKicking = false;
-                }                
-            }
-        }).start();
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleRightDirection,forward);
+
+			Thread.sleep(tentacleKickTime);
+
+			MOTORMUX.sendData(tentacleRightDirection,backward);
+
+			Thread.sleep(tentacleKickTime);                                       
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin kickRight");
+		} finally {
+//			MOTORMUX.sendData(tentacleRightDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			isRightKicking = false;
+		}
 	}
 	
 	@Override
@@ -406,32 +410,27 @@ public class BrickController implements Controller {
 		areSidesKicking = true;
 		
         // TODO: Get the timings right.
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
-                    MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
-                    MOTORMUX.sendData(tentacleLeftDirection,forward);
-                    MOTORMUX.sendData(tentacleRightDirection,forward);
-                	
-                    Thread.sleep(tentacleKickTime);
-                    
-                    MOTORMUX.sendData(tentacleRightDirection,backward);
-                    MOTORMUX.sendData(tentacleLeftDirection,backward);
-                    
-                    Thread.sleep(tentacleKickTime);
-                } catch (InterruptedException e) {
-                    drawMessage("InterruptedException\nin kickSides");
-                } finally {
-                    MOTORMUX.sendData(tentacleRightDirection, off);
-                    MOTORMUX.sendData(tentacleLeftDirection, off);
-                    MOTORMUX.sendData(tentacleRightSpeed, off);
-                    MOTORMUX.sendData(tentacleLeftSpeed, off);
-                    areSidesKicking = false;
-                }                               
-            }
-        }).start();
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,backward);
+			MOTORMUX.sendData(tentacleRightDirection,forward);
+
+			Thread.sleep(tentacleKickTime);
+
+			MOTORMUX.sendData(tentacleRightDirection,backward);
+			MOTORMUX.sendData(tentacleLeftDirection,forward);
+
+			Thread.sleep(tentacleKickTime);
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin kickSides");
+		} finally {
+//			MOTORMUX.sendData(tentacleRightDirection, off);
+//			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			areSidesKicking = false;
+		}
 	}
 	
 	@Override
@@ -448,37 +447,142 @@ public class BrickController implements Controller {
 	@Override
 	public void extendBoth() {
 		// TODO: Method stub
+		
+		if (isLeftExtended || isRightExtended || areSidesExtended)
+			return;
+		
 		drawMessage("extb");
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,backward);
+			MOTORMUX.sendData(tentacleRightDirection,forward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin extBoth");
+		} finally {
+			//MOTORMUX.sendData(tentacleRightDirection, off);
+			//MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			areSidesExtended = true;
+		}
 	}
 	
 	@Override
 	public void extendLeft() {
+		
+		if (isLeftExtended || areSidesExtended)
+			return;
+		
 		// TODO: Method stub
 		drawMessage("extl");
+		try {
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,backward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin extLeft");
+		} finally {
+//			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			isLeftExtended = true;
+		}
 	}
 	
 	@Override
 	public void extendRight() {
+		
+		if (isRightExtended || areSidesExtended)
+			return;
+		
 		// TODO: Method stub
 		drawMessage("extr");
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleRightDirection,forward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin extRight");
+		} finally {
+			//MOTORMUX.sendData(tentacleRightDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			isRightExtended = true;
+		}
 	}
 	
 	@Override
 	public void retractBoth() {
-		// TODO: Method stub
+		if (!areSidesExtended)
+			return;
+		
 		drawMessage("retb");
+		
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,forward);
+			MOTORMUX.sendData(tentacleRightDirection,backward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin retBoth");
+		} finally {
+//			MOTORMUX.sendData(tentacleRightDirection, off);
+//			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			areSidesExtended = false;
+		}
 	}
 	
 	@Override
 	public void retractLeft() {
-		// TODO: Method stub
+		if (!isLeftExtended)
+			return;
+
 		drawMessage("retl");
+		try {
+			MOTORMUX.sendData(tentacleLeftSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleLeftDirection,forward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin retLeft");
+		} finally {
+//			MOTORMUX.sendData(tentacleLeftDirection, off);
+			MOTORMUX.sendData(tentacleLeftSpeed, lowPower);
+			isLeftExtended = false;
+		}
 	}
 	
 	@Override
 	public void retractRight() {
-		// TODO: Method stub
+		if (!isRightExtended)
+			return;
+
 		drawMessage("retr");
+		try {
+			MOTORMUX.sendData(tentacleRightSpeed,kickSpeed);
+			MOTORMUX.sendData(tentacleRightDirection,backward);
+
+			Thread.sleep(tentacleExtTime);
+
+		} catch (InterruptedException e) {
+			drawMessage("InterruptedException\nin retRight");
+		} finally {
+			//MOTORMUX.sendData(tentacleRightDirection, off);
+			MOTORMUX.sendData(tentacleRightSpeed, lowPower);
+			isRightExtended = false;
+		}
 	}
 	
 	@Override
