@@ -9,8 +9,8 @@ import lejos.pc.comm.NXTConnector;
 
 public class Communicator {
 
-    private final static String NAME      = "Kraken";
-    private final static String MAC       = "00:16:53:08:9F:AF";
+    private final static String NAME      = "group2";
+    private final static String MAC       = "00:16:53:0A:27:BB";
 
     private boolean             connected = false;
     NXTConnector                conn;
