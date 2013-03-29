@@ -214,6 +214,8 @@ public class Kraken {
             MessageDecoder decoder = new MessageDecoder();
 
             listener.start();
+            
+            controller.dribblersOn();
 
             while (true) {
                 // Enter button click will halt the program
@@ -292,6 +294,7 @@ public class Kraken {
 
             connection.close();
             controller.muxOff();
+            controller.dribblersOff();
 
         }
         
