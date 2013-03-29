@@ -35,7 +35,8 @@ public class Pitch extends StaticFieldObject {
     }
     
     public Pitch() {
-    	this(0, 2.44, 0, 1.22);
+    	// Test with smaller pitch.
+    	this(0, 2.30, 0, 1.00);
     }
 
     public Pitch(double minX, double maxX, double minY, double maxY) {
