@@ -33,7 +33,7 @@ public class ModifiedGoToObjectPFN implements MovementExecutor {
     private double OPPONENT_INFLUENCE_DISTANCE;
     private static final double DEFAULT_OPPONENT_INFLUENCE_DISTANCE = 0;
     private double TARGET_POWER;
-    private static final double DEFAULT_TARGET_POWER = 6;
+    private static final double DEFAULT_TARGET_POWER = 10;
     private double ALPHA;
     private static final double DEFAULT_ALPHA = 0;
 
@@ -88,8 +88,8 @@ public class ModifiedGoToObjectPFN implements MovementExecutor {
                 OPPONENT_INFLUENCE_DISTANCE, TARGET_POWER, ALPHA);
 
         // Add walls
-        double wallPower = 0.05;
-        double wallInfDist = 0.1;
+        double wallPower = 10;
+        double wallInfDist = -0.05;
         RectObject leftWall = new RectObject(
                 new Point(0, Globals.PITCH_HEIGHT), new Point(0, 0), wallPower,
                 wallInfDist);
@@ -171,15 +171,19 @@ public class ModifiedGoToObjectPFN implements MovementExecutor {
 
         // Target pos
         Point targetLoc = null;
+        Point targetLoc2 = new Point(target.getPosition().getX(), target
+                .getPosition().getY());
         System.out.println(target.getPosition().getY());
         if (target.getPosition().getY()>=0.6){
         	targetLoc = new Point(target.getPosition().getX(), target
-                .getPosition().getY());
+                .getPosition().getY()-0.2);
         } else{
         	targetLoc = new Point(target.getPosition().getX(), target
-                    .getPosition().getY());
+                    .getPosition().getY()+0.2);
         }
-
+        if (snapshot.getBalle().getPosition().dist(new Coord (targetLoc.getX(),targetLoc.getY()))<0.1){
+        	targetLoc=targetLoc2;
+        }
         VelocityVec res = plann.update(initPos, opponent, targetLoc);
         if (!shouldSlowDownCloseToTarget()) {
             Vector newRes = res.mult(4);
