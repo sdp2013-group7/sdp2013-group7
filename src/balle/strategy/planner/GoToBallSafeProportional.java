@@ -31,6 +31,12 @@ public class GoToBallSafeProportional extends GoToBall {
 
 		turnHack = new TurnHack();
     }
+    
+    public GoToBallSafeProportional(boolean slowDownCloseToTarget) {
+    	super(new GoToObjectPFN(0,false));
+    	
+    	turnHack = new TurnHack();
+    }
 
     public GoToBallSafeProportional(double avoidanceGap, double overshootGap,
             boolean approachfromCorrectSide) {
