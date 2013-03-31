@@ -6,13 +6,17 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 
 import balle.main.drawable.DrawableRectangularObject;
-import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.movement.ModifiedGoToObjectPFN;
+import balle.strategy.executor.movement.MovementExecutor;
 import balle.strategy.planner.AbstractPlanner;
+import balle.strategy.planner.CurvyIntercept;
 import balle.strategy.planner.GoToBallNoGoals;
+import balle.world.Coord;
 import balle.world.Line;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
 import balle.world.objects.Goal;
+import balle.world.objects.Point;
 import balle.world.objects.RectangularObject;
 import balle.world.objects.Robot;
 
@@ -29,34 +33,43 @@ public class NewDribble extends AbstractPlanner {
 	private Robot ourRobot;
 	private Ball ball;
 	private Goal goal;
-	private Strategy goToBallSimple;
 	private boolean done = false;
-    
+	private MovementExecutor movementExecutor;
+    private boolean trying = true;
     public boolean hasBall(Ball ball) {
         
     	if ((ball.getPosition() == null) || (ourRobot.getPosition() == null))
             return false;
         
-        Line frontLine = ourRobot.getFrontSide().extendBothDirections(-0.02);
+        Line frontLine = ourRobot.getFrontSide().extendBothDirections(-0.03);
 		double distance = (frontLine.dist(ball.getPosition()));
         
 		// Draw possession area
-        RectangularObject possessionRect = frontLine.widen(0.01);
+        RectangularObject possessionRect = frontLine.widen(0.001);
 		addDrawable(new DrawableRectangularObject (possessionRect, Color.BLUE));
 		
         return distance <= 0.01;
     }
-	public NewDribble() {
-		goToBallSimple = new  GoToBallNoGoals(new GoToObjectPFN(0,true), false);
-		
+	 public NewDribble(MovementExecutor movementExecutor) {
+	    	this.movementExecutor = movementExecutor;
+	        
+	    }
+	   
+	@FactoryMethod(designator = "New Dribble bitchez", parameterNames = {})
+	public static final NewDribble factoryMethod() {
+		 return new NewDribble ( new ModifiedGoToObjectPFN(0.05));
 	}
 
 	// method to stop strategies that would not usually stop themselves
 	@Override
 	public void stop(Controller controller) {
 		controller.dribblersOff();
-		goToBallSimple.stop(controller);
+		controller.stop();
 	}
+	
+	
+///////////////////////////////////////ON STEP///////////////////////////////////
+	
 	
 	@Override
 	protected void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
@@ -80,12 +93,19 @@ public class NewDribble extends AbstractPlanner {
 		}
 		
 		// If we dont have possession  of the ball go for it.
-		if (!hasBall(ball)){
+		if (!hasBall(ball)&&trying){
 			LOG.info("We has no ball. I shall get it.");
-			goToBallSimple.step(controller, snapshot);
-			// Adds the point of positioning of our robot while 
-			//executing the goToBallSimple.
-			addDrawables(goToBallSimple.getDrawables());
+			
+			
+			double newX=ball.getPosition().getX();
+			double newY=ball.getPosition().getY();
+			Coord target =new Coord (newX,newY);
+			movementExecutor.updateTarget(new Point(target));
+			//movementExecutor.updateTarget(new Point(target));
+			addDrawables(movementExecutor.getDrawables());
+			movementExecutor.step(controller, snapshot);
+			if (movementExecutor.isFinished(snapshot)) trying=false;
+			
 		}
 		// Else turn the "dribblers" on and go backwards and we are done.
 		else {
@@ -123,11 +143,5 @@ public class NewDribble extends AbstractPlanner {
 		
 	}
 	
-	// FactoryMethod is used to make the strategy appear in the simulator drop-down menu.
-	@FactoryMethod(designator = "NewDribble", parameterNames = {})
-	public static NewDribble factoryMethod()
-	{
-		return new NewDribble();
-	} 
-	
+
 }
