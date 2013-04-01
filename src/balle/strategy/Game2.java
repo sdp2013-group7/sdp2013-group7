@@ -21,7 +21,6 @@ import balle.strategy.pathFinding.SimplePathFinder;
 import balle.strategy.planner.AbstractPlanner;
 import balle.strategy.planner.BackingOffStrategy;
 import balle.strategy.planner.DefensiveStrategy;
-import balle.strategy.planner.DribbleAndScore;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialBezierStrategy;
@@ -44,7 +43,7 @@ public class Game2 extends AbstractPlanner {
 	
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
-    protected final DribbleAndScore kickingStrategy;
+    protected final Dribble kickingStrategy;
     protected final NewDribble pickBallFromWallStrategy;
     protected final Strategy defensiveStrategy;
     protected final Strategy opponentKickDefendStrategy;
@@ -120,13 +119,13 @@ public class Game2 extends AbstractPlanner {
     // initialise strategies that are to be used
     public Game2() {
     	
-        defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
+    	defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
         opponentKickDefendStrategy = new DefensiveStrategy(new GoToObjectPFN(0));
         pickBallFromWallStrategy = new NewDribble(new ModifiedGoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
-        kickingStrategy = new DribbleAndScore();
-        initialStrategy = new InitialBezierStrategy();
+        kickingStrategy = new Dribble();
+        initialStrategy = new GoToBallSafeProportional(false); //new InitialBezierStrategy();
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(new CustomCHI())));
         goToBallPrecision = new GoToBall(new GoToObjectPFN(0), false);
@@ -287,7 +286,7 @@ public class Game2 extends AbstractPlanner {
         addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(), Color.red));
 
         // if kickingstrat dribbling the ball and it's position is estimated and ball less than 2 robot lengths away or (ball in the dribblebox and robot not facing own goal)
-        if (( ball.getPosition().isEstimated() && ball
+        if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
                 .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
                 || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
                         .isFacingGoalHalf(ownGoal))) {
@@ -354,13 +353,6 @@ public class Game2 extends AbstractPlanner {
 			return goToBallPFN;
 		}
 
-		// if robot not near wall and ball not near wall and dist from front of robot to ball is less than 0.2m 
-        if ((!ourRobot.isNearWall(snapshot.getPitch()))
-                && (!ball.isNearWall(snapshot.getPitch()))
-                && (ourRobot.getFrontSide().midpoint().dist(ball.getPosition()) < 0.2)) {
-        	
-            return goToBallPrecision;
-        }
         if (ball.isNearWall(snapshot.getPitch())){
         	
             return pickBallFromWallStrategy;
