@@ -168,8 +168,7 @@ public class PenaltyDefenseWithTentacles extends Game {
             controller.setWheelSpeeds(-SPEED, -SPEED);
             
         }
-        
-//		else if (!(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
+
 			
 		else if (!(firstSnapshot.getBall().getPosition().equalsWithoutEstimates(newBallPosition))){
 			
