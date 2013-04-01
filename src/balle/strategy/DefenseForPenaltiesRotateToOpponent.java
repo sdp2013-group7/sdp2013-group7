@@ -115,7 +115,7 @@ public class DefenseForPenaltiesRotateToOpponent extends Game {
 				// tweek the rotation speed to suitable for real life
 				controller.rotate((int)finalAngle, 25);
 			}
-			else if ((finishedRotating == true)&& !(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
+			else if ((finishedRotating == true)&& (!(firstSnapshot.getBall().getPosition().equalsWithoutEstimates(newBallPosition)))){
 				
 				LOG.info("tentacles have been extended");
 				controller.extendBoth();

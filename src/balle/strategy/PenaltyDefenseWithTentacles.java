@@ -169,7 +169,9 @@ public class PenaltyDefenseWithTentacles extends Game {
             
         }
         
-		else if (!(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
+//		else if (!(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
+			
+		else if (!(firstSnapshot.getBall().getPosition().equalsWithoutEstimates(newBallPosition))){
 			
 			LOG.info("tentacles have been extended" + firstSnapshot.getBall().getPosition().toString()+newBallPosition.toString());
         	controller.extendBoth();

@@ -113,6 +113,22 @@ public class Coord {
 				&& Math.abs(otherCoord.y - this.y) < 0.00001
 				&& otherCoord.isEstimated() == this.isEstimated();
 	}
+	
+	public boolean equalsWithoutEstimates (Coord other){
+		
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (this.getClass() != other.getClass())
+			return false;
+	
+		return Math.abs(other.x - this.x) < 0.00001&& Math.abs(other.y - this.y) < 0.00001;
+				
+		
+		
+		
+	}
 
 	/**
 	 * Returns true if Coordinate is reachable via a straight line from another
