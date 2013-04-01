@@ -24,6 +24,7 @@ import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialBezierStrategy;
+import balle.strategy.Dribble2;
 import balle.strategy.NewDribble;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
@@ -43,7 +44,7 @@ public class Game2 extends AbstractPlanner {
 	
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
-    protected final Dribble kickingStrategy;
+    protected final Dribble2 kickingStrategy;
     protected final NewDribble pickBallFromWallStrategy;
     protected final Strategy defensiveStrategy;
     protected final Strategy opponentKickDefendStrategy;
@@ -124,7 +125,7 @@ public class Game2 extends AbstractPlanner {
         pickBallFromWallStrategy = new NewDribble(new ModifiedGoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
-        kickingStrategy = new Dribble();
+        kickingStrategy = new Dribble2();
         initialStrategy = new InitialBezierStrategy(180);
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(new CustomCHI())));
@@ -242,7 +243,7 @@ public class Game2 extends AbstractPlanner {
 		// if dribble_M4 doesn't equal the new strategy
         if ("balle.strategy.Dribble_M4".equals(oldStrategy)&& !oldStrategy.equals(getCurrentStrategy())) {
         	
-            LOG.info("Stopped using Dribble for " + getCurrentStrategy());
+            LOG.info("Stopped using Dribble2 for " + getCurrentStrategy());
             LOG.info(ourRobot.getOrientation().degrees());
             LOG.info(ourRobot.getFrontSide().midpoint() .dist(ball.getPosition()));
         }
