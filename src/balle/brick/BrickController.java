@@ -46,7 +46,8 @@ public class BrickController implements Controller {
 
     // Our gear ratio is 5/3
     public static final float GEAR_ERROR_RATIO = (float) 5 / 3;
-
+    
+    private boolean isDribbling = false;
     private volatile boolean isKicking = false;
     private volatile boolean isLeftKicking = false;
     private volatile boolean isRightKicking = false;
@@ -54,7 +55,7 @@ public class BrickController implements Controller {
     private boolean areSidesExtended = false;
     private boolean isLeftExtended = false;
     private boolean isRightExtended = false;
-    private final int tentacleKickTime = 75;
+    private final int tentacleKickTime = 85;
     private final int tentacleExtTime = 40;
     private final int mainKickTime = 80;
 
@@ -102,6 +103,18 @@ public class BrickController implements Controller {
 //        RIGHT_WHEEL.smoothAcceleration(true);
 //        KICKER.smoothAcceleration(false);
 //        KICKER.regulateSpeed(false);
+        
+        // Start the dribblers and power the wings
+        dribblersOn();
+        
+        MOTORMUX.sendData(tentacleRightDirection,off);
+    	MOTORMUX.sendData(tentacleLeftDirection,off);
+    	
+    	MOTORMUX.sendData(tentacleRightSpeed,lowPower);
+    	MOTORMUX.sendData(tentacleLeftSpeed,lowPower);
+    	
+    	MOTORMUX.sendData(tentacleRightDirection,backward);
+		MOTORMUX.sendData(tentacleLeftDirection,forward);
 
     }
     
@@ -172,6 +185,10 @@ public class BrickController implements Controller {
         if (isKicking) {
             return;
         }
+        
+        boolean wasDribbling = isDribbling;
+        
+        dribblersOff();
 
         isKicking = true;
         
@@ -198,6 +215,9 @@ public class BrickController implements Controller {
         	MOTORMUX.sendData(kicker2Speed, off);
         	isKicking = false;
         }
+        
+        if (wasDribbling)
+        	dribblersOn();
         
     }
 
@@ -435,12 +455,14 @@ public class BrickController implements Controller {
 	
 	@Override
 	public void dribblersOn() {
+		isDribbling = true;
 		DRIBBLER.setPower(100);
 		DRIBBLER.backward();
 	}
 	
 	@Override
 	public void dribblersOff() {
+		isDribbling = false;
 		DRIBBLER.stop();
 	}
 	
