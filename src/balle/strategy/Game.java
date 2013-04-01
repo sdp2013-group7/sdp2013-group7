@@ -2,9 +2,7 @@ package balle.strategy;
 
 import java.awt.Color;
 import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-
 import balle.controller.Controller;
 import balle.main.drawable.Circle;
 import balle.main.drawable.Drawable;
@@ -16,6 +14,7 @@ import balle.simulator.SnapshotPredictor;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.movement.ModifiedGoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.pathFinding.SimplePathFinder;
@@ -25,7 +24,6 @@ import balle.strategy.planner.DefensiveStrategy;
 import balle.strategy.planner.GoToBall;
 import balle.strategy.planner.GoToBallSafeProportional;
 import balle.strategy.planner.InitialBezierStrategy;
-import balle.strategy.planner.KickFromWall;
 import balle.strategy.planner.SimpleGoToBallFaceGoal;
 import balle.world.Coord;
 import balle.world.Line;
@@ -45,10 +43,9 @@ public class Game extends AbstractPlanner {
     protected final BackingOffStrategy backingOffStrategy;
 	protected final RotateToOrientationExecutor turningExecutor;
     protected final Dribble kickingStrategy;
-    
+    protected final NewDribble pickBallFromWallStrategy;
     protected final Strategy defensiveStrategy;
     protected final Strategy opponentKickDefendStrategy;
-	protected final Strategy pickBallFromWallStrategy;
     protected final Strategy goToBallPFN;
 	protected final Strategy goToBallBezier;
     protected final Strategy goToBallPrecision;
@@ -131,7 +128,7 @@ public class Game extends AbstractPlanner {
     	
         defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
         opponentKickDefendStrategy = new DefensiveStrategy(new GoToObjectPFN(0));
-        pickBallFromWallStrategy = new KickFromWall(new GoToObjectPFN(0));
+        pickBallFromWallStrategy = new NewDribble(new ModifiedGoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble();
@@ -371,7 +368,10 @@ public class Game extends AbstractPlanner {
         	
             return goToBallPrecision;
         }
-
+        if (ball.isNearWall(snapshot.getPitch())){
+        	
+            return pickBallFromWallStrategy;
+        }
         // if not any of the above, use this one
 		return goToBallBezier;
 
