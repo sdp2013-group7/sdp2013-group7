@@ -14,6 +14,7 @@ import balle.simulator.SnapshotPredictor;
 import balle.strategy.bezierNav.BezierNav;
 import balle.strategy.curve.CustomCHI;
 import balle.strategy.executor.movement.GoToObjectPFN;
+import balle.strategy.executor.movement.ModifiedGoToObjectPFN;
 import balle.strategy.executor.turning.IncFaceAngle;
 import balle.strategy.executor.turning.RotateToOrientationExecutor;
 import balle.strategy.pathFinding.SimplePathFinder;
@@ -50,7 +51,6 @@ public class Game2 extends AbstractPlanner {
     protected final Strategy goToBallPFN;
 	protected final Strategy goToBallBezier;
     protected final Strategy goToBallPrecision;
-    
     protected Strategy initialStrategy;
 
     protected boolean initial;
@@ -122,7 +122,7 @@ public class Game2 extends AbstractPlanner {
     	
         defensiveStrategy = new GoToBallSafeProportional(0.5, 0.4, true);
         opponentKickDefendStrategy = new DefensiveStrategy(new GoToObjectPFN(0));
-        pickBallFromWallStrategy = new NewDribble();
+        pickBallFromWallStrategy = new NewDribble(new ModifiedGoToObjectPFN(0));
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new DribbleAndScore();
