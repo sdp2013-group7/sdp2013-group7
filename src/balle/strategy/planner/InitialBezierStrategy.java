@@ -25,7 +25,7 @@ public class InitialBezierStrategy extends AbstractPlanner {
     }
 
     public InitialBezierStrategy() {
-        this(70);
+        this(0);
     }
 
     public FieldObject getTarget(Snapshot snapshot) {
