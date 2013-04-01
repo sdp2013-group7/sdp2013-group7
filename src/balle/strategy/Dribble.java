@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import balle.controller.Controller;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.world.objects.Robot;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
 import balle.world.Orientation;
@@ -90,10 +91,10 @@ public class Dribble extends AbstractPlanner {
 
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
-
+		
         if (snapshot.getBalle().getPosition() == null)
             return;
-
+       Robot ourRobot = snapshot.getBalle();
         // Make sure to reset the speeds if we haven't been dribbling for a
         // while
         long currentTime = System.currentTimeMillis();
@@ -101,7 +102,7 @@ public class Dribble extends AbstractPlanner {
       
         if (!isDribbling()) {
             // Kick the ball if we're triggerhappy and should stop dribbling
-            if (isTriggerHappy() && !isInactiveForAWhile()
+            if (ourRobot.canScoreNoOpposition(snapshot.getBall(), snapshot.getOpponentsGoal())&& isTriggerHappy() && !isInactiveForAWhile()
                     && shouldStopDribblingDueToDribbleLength()
                     && !facingOwnGoalSide)
                 controller.kick();
@@ -255,7 +256,7 @@ public class Dribble extends AbstractPlanner {
 			}
 		}
 
-        if (facingGoal || (isTriggerHappy() && nearWall && !facingOwnGoalSide)
+        if (ourRobot.canScoreNoOpposition(snapshot.getBall(), snapshot.getOpponentsGoal())
                 || (isTriggerHappy() && aboutToLoseBall && !facingOwnGoalSide)) {
             controller.kick();
         }
