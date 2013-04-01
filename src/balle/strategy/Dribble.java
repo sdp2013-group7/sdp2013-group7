@@ -1,15 +1,19 @@
 package balle.strategy;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 
 import org.apache.log4j.Logger;
 
 import balle.controller.Controller;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
+import balle.world.objects.Ball;
+import balle.world.objects.Goal;
 import balle.world.objects.Robot;
 import balle.strategy.planner.AbstractPlanner;
 import balle.world.Coord;
+import balle.world.Line;
 import balle.world.Orientation;
 import balle.world.Snapshot;
 
@@ -88,7 +92,28 @@ public class Dribble extends AbstractPlanner {
         addDrawable(new Label("--->", snapshot.getBalle().getPosition(),
                 Color.CYAN));
     }
-
+    
+    public boolean shouldKick(Snapshot snapshot){
+    	Robot opponent = snapshot.getOpponent();
+    	Robot us = snapshot.getBalle();
+    	Goal theirs = snapshot.getOpponentsGoal();
+    	//Goal ours = snapshot.getOwnGoal();
+    	Ball ball = snapshot.getBall();
+    	boolean canScore = us.canScoreNoOpposition(ball, theirs);	
+    	Line left = opponent.getLeftSide();
+    	Line right = opponent.getRightSide();
+    	Line top = opponent.getFrontSide();
+    	Line down = opponent.getBackSide();
+    	if (!canScore||us.intersects(left)||us.intersects(right)||us.intersects(top)||us.intersects(down)){
+    		return false;
+    	} else{
+    	return true;
+    	}
+    }
+    
+    
+    
+    //////////////////////////// ON STEP ///////////////////////////////////
 	@Override
 	public void onStep(Controller controller, Snapshot snapshot) throws ConfusedException {
 		
@@ -102,9 +127,7 @@ public class Dribble extends AbstractPlanner {
       
         if (!isDribbling()) {
             // Kick the ball if we're triggerhappy and should stop dribbling
-            if (ourRobot.canScoreNoOpposition(snapshot.getBall(), snapshot.getOpponentsGoal())&& isTriggerHappy() && !isInactiveForAWhile()
-                    && shouldStopDribblingDueToDribbleLength()
-                    && !facingOwnGoalSide)
+            if (shouldKick(snapshot))
                 controller.kick();
             currentSpeed = INITIAL_CURRENT_SPEED;
             turnSpeed = INITIAL_TURN_SPEED;
@@ -256,8 +279,7 @@ public class Dribble extends AbstractPlanner {
 			}
 		}
 
-        if (ourRobot.canScoreNoOpposition(snapshot.getBall(), snapshot.getOpponentsGoal())
-                || (isTriggerHappy() && aboutToLoseBall && !facingOwnGoalSide)) {
+        if (shouldKick(snapshot)) {
             controller.kick();
         }
 
