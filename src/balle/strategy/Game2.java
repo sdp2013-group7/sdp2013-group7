@@ -125,7 +125,7 @@ public class Game2 extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble();
-        initialStrategy = new GoToBallSafeProportional(false); //new InitialBezierStrategy();
+        initialStrategy = new InitialBezierStrategy(0);
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(new CustomCHI())));
         goToBallPrecision = new GoToBall(new GoToObjectPFN(0), false);
