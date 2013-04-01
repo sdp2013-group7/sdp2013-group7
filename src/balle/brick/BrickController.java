@@ -315,9 +315,9 @@ public class BrickController implements Controller {
                 int rightCount = RIGHT_WHEEL.getTachoCount();
                 
                 if (leftCount > rightCount) {
-                    setWheelSpeeds(ROLL_SPEED - 1, ROLL_SPEED);
+                    setWheelSpeeds(((int)(ROLL_SPEED*0.95)), ROLL_SPEED);
                 } else if (leftCount < rightCount) {
-                    setWheelSpeeds(ROLL_SPEED, ROLL_SPEED - 1);
+                    setWheelSpeeds(ROLL_SPEED,((int) (ROLL_SPEED*0.95)));
                 } else {
                     setWheelSpeeds(ROLL_SPEED, ROLL_SPEED);
                 }

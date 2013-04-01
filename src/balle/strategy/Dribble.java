@@ -1,10 +1,7 @@
 package balle.strategy;
 
 import java.awt.Color;
-import java.awt.Rectangle;
-
 import org.apache.log4j.Logger;
-
 import balle.controller.Controller;
 import balle.main.drawable.Label;
 import balle.misc.Globals;
@@ -119,11 +116,11 @@ public class Dribble extends AbstractPlanner {
 		
         if (snapshot.getBalle().getPosition() == null)
             return;
-       Robot ourRobot = snapshot.getBalle();
+       
         // Make sure to reset the speeds if we haven't been dribbling for a
         // while
         long currentTime = System.currentTimeMillis();
-        boolean facingOwnGoalSide = snapshot.getBalle().isFacingGoalHalf(snapshot.getOwnGoal());
+        //boolean facingOwnGoalSide = snapshot.getBalle().isFacingGoalHalf(snapshot.getOwnGoal());
       
         if (!isDribbling()) {
             // Kick the ball if we're triggerhappy and should stop dribbling
