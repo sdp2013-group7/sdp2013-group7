@@ -152,19 +152,30 @@ public class PenaltyDefenseWithTentacles extends Game {
 		}
 
         MovementDirection movementDirection = getMovementDirection(snapshot);
-        if (movementDirection == MovementDirection.FORWARD){
+        Coord newBallPosition = snapshot.getBall().getPosition();
+        
+        if (movementDirection == MovementDirection.FORWARD && firstSnapshot.getBall().getPosition()!= snapshot.getBall().getPosition()){
+        	
         	LOG.info("tentacles have been extended");
         	controller.extendBoth();
             controller.setWheelSpeeds(SPEED, SPEED);
         }
-        else if (movementDirection == MovementDirection.BACKWARD){
+        else if (movementDirection == MovementDirection.BACKWARD&& firstSnapshot.getBall().getPosition()!= snapshot.getBall().getPosition()){
+        	
+        	
         	LOG.info("tentacles have been extended");
         	controller.extendBoth();
             controller.setWheelSpeeds(-SPEED, -SPEED);
+            
         }
-		else{
-			LOG.info("tentacles have been extended");
+        
+		else if (!(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
+			
+			LOG.info("tentacles have been extended" + firstSnapshot.getBall().getPosition().toString()+newBallPosition.toString());
         	controller.extendBoth();
+        	
+		}
+		else{
 			controller.stop();
 		}
 	}

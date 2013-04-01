@@ -1,33 +1,17 @@
 package balle.strategy;
 
-import java.awt.Color;
-
 import org.apache.log4j.Logger;
-
 import balle.controller.Controller;
-import balle.main.drawable.Dot;
-import balle.misc.Globals;
 import balle.world.Coord;
-import balle.world.Orientation;
 import balle.world.Snapshot;
 import balle.world.objects.Ball;
-import balle.world.objects.Goal;
 import balle.world.objects.Robot;
 
 public class DefenseForPenaltiesRotateToOpponent extends Game {
 
 	
 	private boolean finishedRotating = false;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-    private int SPEED;
+	private int SPEED;
 
     private static Logger LOG = Logger.getLogger(DefenseForPenaltiesRotateToOpponent.class);
 
@@ -35,9 +19,6 @@ public class DefenseForPenaltiesRotateToOpponent extends Game {
 	String robotState = "Center";
 	int rotateSpeed = 0;
 
-    private enum MovementDirection {
-        FORWARD, BACKWARD, NONE
-    };
 
 	private boolean finished = false;
 
@@ -116,11 +97,9 @@ public class DefenseForPenaltiesRotateToOpponent extends Game {
 			Coord targetCoord = ball.getPosition();
 			double angleToRotate = ourRobot.getAngleToTurnToTarget(targetCoord);
 			double finalAngle = angleToRotate *100;
-			
+			Coord newBallPosition = snapshot.getBall().getPosition();
 			
 			LOG.info("angle to turn: "+finalAngle);
-			
-			
 			
 			
 			// tweek this error value till it is good in real life
@@ -131,12 +110,12 @@ public class DefenseForPenaltiesRotateToOpponent extends Game {
 			}
 			
 			else if (finishedRotating == false){ 
-				LOG.info("tentacles have been extended");
+				LOG.info("rotating");
 				
 				// tweek the rotation speed to suitable for real life
 				controller.rotate((int)finalAngle, 25);
 			}
-			else if (finishedRotating == true){
+			else if ((finishedRotating == true)&& !(firstSnapshot.getBall().getPosition().x == newBallPosition.x) || !(firstSnapshot.getBall().getPosition().y == newBallPosition.y)){
 				
 				LOG.info("tentacles have been extended");
 				controller.extendBoth();
