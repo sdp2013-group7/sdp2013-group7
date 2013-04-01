@@ -91,20 +91,33 @@ public class Dribble extends AbstractPlanner {
     }
     
     public boolean shouldKick(Snapshot snapshot){
-    	Robot opponent = snapshot.getOpponent();
-    	Robot us = snapshot.getBalle();
-    	Goal theirs = snapshot.getOpponentsGoal();
-    	//Goal ours = snapshot.getOwnGoal();
-    	Ball ball = snapshot.getBall();
-    	boolean canScore = us.canScoreNoOpposition(ball, theirs);	
-    	Line left = opponent.getLeftSide();
-    	Line right = opponent.getRightSide();
-    	Line top = opponent.getFrontSide();
-    	Line down = opponent.getBackSide();
-    	if (!canScore||us.intersects(left)||us.intersects(right)||us.intersects(top)||us.intersects(down)){
-    		return false;
-    	} else{
-    	return true;
+    	if (snapshot.getOpponent()!=null){
+	    	Robot opponent = snapshot.getOpponent();
+	    	Robot us = snapshot.getBalle();
+	    	Goal theirs = snapshot.getOpponentsGoal();
+	    	//Goal ours = snapshot.getOwnGoal();
+	    	Ball ball = snapshot.getBall();
+	    	boolean canScore = us.canScoreNoOpposition(ball, theirs);	
+	    	Line left = opponent.getLeftSide();
+	    	Line right = opponent.getRightSide();
+	    	Line top = opponent.getFrontSide();
+	    	Line down = opponent.getBackSide();
+	    	if (!canScore||us.intersects(left)||us.intersects(right)||us.intersects(top)||us.intersects(down)){
+	    		return false;
+	    	} else{
+	    	return true;
+	    	}
+	    }else{
+	    	Robot us = snapshot.getBalle();
+	    	Goal theirs = snapshot.getOpponentsGoal();
+	    	Ball ball = snapshot.getBall();
+	    	boolean canScore = us.canScoreNoOpposition(ball, theirs);	
+	    	
+	    	if (!canScore){
+	    		return false;
+	    	} else{
+	    	return true;
+	    	}
     	}
     }
     
