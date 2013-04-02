@@ -148,7 +148,6 @@ public class Dribble2 extends AbstractPlanner {
         if (!isDribbling()) {
             // Kick the ball if we're triggerhappy and should stop dribbling
             if (shouldKick(snapshot)){
-            	LOG.info("KICK");
                 controller.kick();
             }
             currentSpeed = INITIAL_CURRENT_SPEED;
@@ -270,39 +269,92 @@ public class Dribble2 extends AbstractPlanner {
   
                 
         }
-
-		if (isLeftGoal) {
-			if (facingGoal) {
-                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
-                        Globals.MAXIMUM_MOTOR_SPEED);
-            } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
-				controller.setWheelSpeeds(currentSpeed, currentSpeed
-                        + turnSpeedToUse);
-			} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
-                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
-						currentSpeed);
-			} else {
-                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+        if (snapshot.getOpponent()==null){
+        	
+			if (isLeftGoal) {
+				
+				if (facingGoal) {
+	                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	            } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
+					controller.setWheelSpeeds(currentSpeed, currentSpeed
+	                        + turnSpeedToUse);
+				} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
+	                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
+							currentSpeed);
+				} else {
+	                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+				}
+	        } else {
+				
+	        	if (facingGoal) {
+	                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	            } else if ((!facingGoal) && (angle > threshold)
+						&& (angle < Math.PI)) {
+	                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
+							currentSpeed);
+				} else if ((!facingGoal) && (angle < (2 * Math.PI) - threshold)
+						&& (angle > Math.PI)) {
+					controller.setWheelSpeeds(currentSpeed, currentSpeed
+	                        + turnSpeedToUse);
+				} else {
+	                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+				}
 			}
-        } else {
-			if (facingGoal) {
-                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
-                        Globals.MAXIMUM_MOTOR_SPEED);
-            } else if ((!facingGoal) && (angle > threshold)
-					&& (angle < Math.PI)) {
-                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
-						currentSpeed);
-			} else if ((!facingGoal) && (angle < (2 * Math.PI) - threshold)
-					&& (angle > Math.PI)) {
-				controller.setWheelSpeeds(currentSpeed, currentSpeed
-                        + turnSpeedToUse);
-			} else {
-                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+	    } else {
+	    	
+	    	Robot us = snapshot.getBalle();
+	    	Robot opponent = snapshot.getOpponent();
+			Line frontLine = opponent.getFrontSide();
+			Line backLine  = opponent.getBackSide();
+			
+			 
+			
+	    	if (isLeftGoal) {
+				if ((us.getFacingLine().intersects(frontLine)||us.getFacingLine().intersects(backLine))&&facingGoal&&snapshot.getBalle().getPosition().dist(snapshot.getOpponent().getPosition())>0.25){
+					if (us.getFacingLine().getCenter().getY()>0.6){
+						controller.setWheelSpeeds(currentSpeed+turnSpeedToUse/2,currentSpeed);
+					}else{
+						controller.setWheelSpeeds(currentSpeed,currentSpeed+turnSpeedToUse/2);
+					}
+					
+				}else if (facingGoal) {
+	                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	            } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
+					controller.setWheelSpeeds(currentSpeed, currentSpeed
+	                        + turnSpeedToUse);
+				} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
+	                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
+							currentSpeed);
+				} else {
+	                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+				}
+	        } else {
+	        	if ((us.getFacingLine().intersects(frontLine)||us.getFacingLine().intersects(backLine))&&facingGoal&&snapshot.getBalle().getPosition().dist(snapshot.getOpponent().getPosition())>0.25){
+					if (us.getFacingLine().getCenter().getY()>0.6){
+						controller.setWheelSpeeds(currentSpeed,currentSpeed+turnSpeedToUse/2);
+					}else{
+						controller.setWheelSpeeds(currentSpeed+turnSpeedToUse/2,currentSpeed);
+					}
+				}else if (facingGoal) {
+	                controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	            } else if ((!facingGoal) && (angle > threshold)
+						&& (angle < Math.PI)) {
+	                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
+							currentSpeed);
+				} else if ((!facingGoal) && (angle < (2 * Math.PI) - threshold)
+						&& (angle > Math.PI)) {
+					controller.setWheelSpeeds(currentSpeed, currentSpeed
+	                        + turnSpeedToUse);
+				} else {
+	                controller.setWheelSpeeds(currentSpeed, currentSpeed);
+				}
 			}
-		}
-
+	    }
         if (shouldKick(snapshot)) {
-        	LOG.info("KICK");
             controller.kick();
         }
 
