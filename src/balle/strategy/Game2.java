@@ -286,6 +286,13 @@ public class Game2 extends AbstractPlanner {
 
         addDrawable(new DrawableLine(newsnap.getBalle().getFrontSide(), Color.red));
 
+		boolean nearLeftOrRight =(pitch.getTopWall().dist(ball.getPosition())<0.1||pitch.getBottomWall().dist(ball.getPosition())<0.1);
+        
+		if (ball.isNearWall(snapshot.getPitch())&&!nearLeftOrRight){
+        	
+            return pickBallFromWallStrategy;
+        }
+        
         // if kickingstrat dribbling the ball and it's position is estimated and ball less than 2 robot lengths away or (ball in the dribblebox and robot not facing own goal)
         if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
                 .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
@@ -353,11 +360,8 @@ public class Game2 extends AbstractPlanner {
 			
 			return goToBallPFN;
 		}
+		
 
-        if (ball.isNearWall(snapshot.getPitch())){
-        	
-            return pickBallFromWallStrategy;
-        }
 
         // if not any of the above, use this one
 		return goToBallBezier;

@@ -91,22 +91,32 @@ public class Dribble2 extends AbstractPlanner {
     }
     
     public boolean shouldKick(Snapshot snapshot){
+    	
+    	// If we have an opponent on the pitch.
     	if (snapshot.getOpponent()!=null){
-	    	Robot opponent = snapshot.getOpponent();
+	    	
+    		Robot opponent = snapshot.getOpponent();
 	    	Robot us = snapshot.getBalle();
 	    	Goal theirs = snapshot.getOpponentsGoal();
-	    	//Goal ours = snapshot.getOwnGoal();
 	    	Ball ball = snapshot.getBall();
+	    	
+	    	
 	    	boolean canScore = us.canScoreNoOpposition(ball, theirs);	
+	    	
 	    	Line left = opponent.getLeftSide();
 	    	Line right = opponent.getRightSide();
-	    	Line top = opponent.getFrontSide();
-	    	Line down = opponent.getBackSide();
-	    	if (!canScore||us.intersects(left)||us.intersects(right)||us.intersects(top)||us.intersects(down)){
+	    	Line front = opponent.getFrontSide();
+	    	Line back = opponent.getBackSide();
+	    	boolean areFacingUs = (us.distanceToFacingWall(front)>us.distanceToFacingWall(back));
+	    	
+	    	if (areFacingUs&&canScore&&(us.intersects(left)||us.intersects(right))&&!us.intersects(front)){
+	    		return true;
+	    	}else if (!areFacingUs&&canScore&&(us.intersects(left)||us.intersects(right))&&!us.intersects(back)){
+	    		return true;
+	    	}else{
 	    		return false;
-	    	} else{
-	    	return true;
 	    	}
+	    	
 	    }else{
 	    	Robot us = snapshot.getBalle();
 	    	Goal theirs = snapshot.getOpponentsGoal();
@@ -137,8 +147,10 @@ public class Dribble2 extends AbstractPlanner {
       
         if (!isDribbling()) {
             // Kick the ball if we're triggerhappy and should stop dribbling
-            if (shouldKick(snapshot))
+            if (shouldKick(snapshot)){
+            	LOG.info("KICK");
                 controller.kick();
+            }
             currentSpeed = INITIAL_CURRENT_SPEED;
             turnSpeed = INITIAL_TURN_SPEED;
             firstDribble2d = currentTime;
@@ -290,6 +302,7 @@ public class Dribble2 extends AbstractPlanner {
 		}
 
         if (shouldKick(snapshot)) {
+        	LOG.info("KICK");
             controller.kick();
         }
 
