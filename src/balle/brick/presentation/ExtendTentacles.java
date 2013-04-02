@@ -9,6 +9,7 @@ public class ExtendTentacles {
 
 		BrickController controller = new BrickController();
 		
+		controller.dribblersOff();
 		controller.extendBoth();
 		
 		Delay.msDelay(1000);
