@@ -118,7 +118,7 @@ public class BrickController implements Controller {
 
     }
     
-    void muxOff() {
+    public void muxOff() {
     	MOTORMUX.sendData(kicker1Speed,off);
     	MOTORMUX.sendData(kicker2Speed,off);
     	MOTORMUX.sendData(tentacleRightSpeed,off);
