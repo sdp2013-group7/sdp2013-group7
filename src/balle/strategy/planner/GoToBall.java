@@ -66,9 +66,9 @@ public class GoToBall extends AbstractPlanner {
         OVERSHOOT_GAP = overshootGap;
     }
 
-    @FactoryMethod(designator = "GoToBall PFN Test", parameterNames = {
-            "ApproachFromCorrectSide", "opponentPower",
-            "opponentInfluenceDistance", "targetPower", "alpha" })
+//    @FactoryMethod(designator = "GoToBall PFN Test", parameterNames = {
+//            "ApproachFromCorrectSide", "opponentPower",
+//            "opponentInfluenceDistance", "targetPower", "alpha" })
     public static GoToBall pfnTestFactory(boolean approachFromCorrectSide,
             double opponentPower, double opponentInfluenceDistance,
             double targetPower, double alpha) {

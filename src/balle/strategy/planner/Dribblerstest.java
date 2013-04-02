@@ -146,7 +146,7 @@ public class Dribblerstest extends AbstractPlanner {
 
 	// Factory method to make DribbleMilestone2 appear in the list of strats in
 	// the simulator
-	@FactoryMethod(designator = "Dribblerstest", parameterNames = {})
+	//@FactoryMethod(designator = "Dribblerstest", parameterNames = {})
 	public static Dribblerstest factoryMethod() {
 
 		return new Dribblerstest();

@@ -132,7 +132,7 @@ public class DribbleAndScore extends AbstractPlanner {
 	}
 
 	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Dribble and Score M3", parameterNames = {})
+	//@FactoryMethod(designator = "Dribble and Score M3", parameterNames = {})
 	public static DribbleAndScore factoryMethod() {
 		return new DribbleAndScore();
 	}

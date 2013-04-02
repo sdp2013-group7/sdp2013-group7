@@ -118,7 +118,7 @@ public class InterceptM4 extends AbstractPlanner {
 	}
 
 	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Intercept M4", parameterNames = {})
+	//@FactoryMethod(designator = "Intercept M4", parameterNames = {})
 	public static InterceptM4 factoryMethod() {
 		return new InterceptM4();
 	}

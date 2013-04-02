@@ -184,7 +184,7 @@ public class GoToBallSafe extends GoToBall {
         super.onStep(controller, snapshot);
     }
 
-    @FactoryMethod(designator = "GoToBallSafe", parameterNames = {})
+//    @FactoryMethod(designator = "GoToBallSafe", parameterNames = {})
     public static GoToBallSafe factoryMethod() {
         return new GoToBallSafe();
     }

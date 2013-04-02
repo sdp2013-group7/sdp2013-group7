@@ -102,7 +102,7 @@ public class Drool extends AbstractPlanner {
 
 	// Factory method to make DribbleMilestone2 appear in the list of strats in
 	// the simulator
-	@FactoryMethod(designator = "Drool", parameterNames = {})
+	//@FactoryMethod(designator = "Drool", parameterNames = {})
 	public static Drool factoryMethod() {
 
 		return new Drool();

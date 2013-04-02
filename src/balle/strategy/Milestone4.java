@@ -63,7 +63,7 @@ public class Milestone4 extends AbstractPlanner {
     }
 
     // put strategy into simulator
-    @FactoryMethod(designator = "Milestone4", parameterNames = {})
+    //@FactoryMethod(designator = "Milestone4", parameterNames = {})
     
     public static Milestone4 factoryMethod() {
     	 Milestone4 strategy = new Milestone4();

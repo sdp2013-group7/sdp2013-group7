@@ -306,7 +306,7 @@ public class GoToBall extends AbstractPlanner {
         executorStrategy.stop(controller);
     }
     
-    @FactoryMethod(designator = "Friendly1 GT", parameterNames = {})
+    //@FactoryMethod(designator = "Friendly1 GT", parameterNames = {})
     public static GoToBall factoryMethod() {
         return new GoToBall(new GoToObjectPFN(0.15f), true);
     }

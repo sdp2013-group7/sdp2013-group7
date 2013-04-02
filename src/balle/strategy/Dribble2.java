@@ -57,7 +57,7 @@ public class Dribble2 extends AbstractPlanner {
         setTriggerHappy(triggerHappy);
     }
 
-    @FactoryMethod(designator = "Dribble2", parameterNames = {})
+//    @FactoryMethod(designator = "Dribble2", parameterNames = {})
 	public static Dribble2 factoryMethod()
 	{
 		return new Dribble2();

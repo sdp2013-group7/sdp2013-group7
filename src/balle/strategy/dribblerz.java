@@ -39,7 +39,7 @@ public class dribblerz extends AbstractPlanner {
     }
 
 
-    @FactoryMethod(designator = "Simple Dribblers", parameterNames = {})
+    //@FactoryMethod(designator = "Simple Dribblers", parameterNames = {})
     public static final dribblerz factory() {
         return new dribblerz();
     }

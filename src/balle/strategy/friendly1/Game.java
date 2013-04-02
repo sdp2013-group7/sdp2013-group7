@@ -204,7 +204,7 @@ public class Game extends AbstractPlanner {
     }
 
     //Factory method to make Friendly1 appear in the list of strats in the simulator
-    @FactoryMethod(designator = "Friendly1", parameterNames = {})
+    //@FactoryMethod(designator = "Friendly1", parameterNames = {})
     public static Game factoryMethod() {
         return new Game();
     }

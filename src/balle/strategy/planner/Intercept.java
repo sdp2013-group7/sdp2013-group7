@@ -312,7 +312,7 @@ public class Intercept extends AbstractPlanner {
 	}
 
 	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Intercept", parameterNames = {})
+	//@FactoryMethod(designator = "Intercept", parameterNames = {})
 	public static Intercept factoryMethod() {
 		return new Intercept();
 	}

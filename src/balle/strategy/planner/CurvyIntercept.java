@@ -55,7 +55,7 @@ public class CurvyIntercept extends AbstractPlanner {
 	        
 	    }
 	   
-    @FactoryMethod(designator = "Curvy Intercept Strategy", parameterNames = {})
+    //@FactoryMethod(designator = "Curvy Intercept Strategy", parameterNames = {})
     public static final CurvyIntercept factoryMethod() {
 		return new CurvyIntercept ( new GoToObjectPFN(0));
     }

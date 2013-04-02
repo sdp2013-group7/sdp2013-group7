@@ -255,7 +255,7 @@ public class AvoidMilestone3 extends AbstractPlanner {
 	}
 
 	// To make it a usable stand-alone strategy
-	@FactoryMethod(designator = "Avoid Milestone 3", parameterNames = {})
+	//@FactoryMethod(designator = "Avoid Milestone 3", parameterNames = {})
 	public static AvoidMilestone3 factoryMethod() {
 		return new AvoidMilestone3();
 	}

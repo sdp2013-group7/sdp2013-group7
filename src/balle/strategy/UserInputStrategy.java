@@ -27,7 +27,7 @@ public class UserInputStrategy extends AbstractPlanner {
 
 	protected boolean kick;
 
-    @FactoryMethod(designator = "UserInput", parameterNames = {})
+//    @FactoryMethod(designator = "UserInput", parameterNames = {})
 	public static UserInputStrategy gameFactory() {
 		return new UserInputStrategy();
 	}

@@ -40,7 +40,7 @@ public class NewDribble extends AbstractPlanner {
 	    	this.movementExecutor = movementExecutor;   
 	    }
 	   
-	@FactoryMethod(designator = "New Dribble bitchez", parameterNames = {})
+	//@FactoryMethod(designator = "New Dribble bitchez", parameterNames = {})
 	public static final NewDribble factoryMethod() {
 		 return new NewDribble ( new ModifiedGoToObjectPFN(0));
 	}

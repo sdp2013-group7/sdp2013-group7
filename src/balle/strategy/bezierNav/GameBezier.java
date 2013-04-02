@@ -30,7 +30,7 @@ public class GameBezier extends AbstractPlanner {
 
 	OrientedMovementExecutor executorStrategy;
 
-    @FactoryMethod(designator = "GameBezier", parameterNames = {})
+    //@FactoryMethod(designator = "GameBezier", parameterNames = {})
 	public static GameBezier gameBezierFactory() {
 		return new GameBezier(new BezierNav(new SimplePathFinder(
 				new CustomCHI())));

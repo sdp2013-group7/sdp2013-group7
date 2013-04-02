@@ -31,7 +31,7 @@ public class CalibrateNeural extends UserInputStrategy {
 
 	protected Robot lastRobot = null, currentRobot = null;
 
-	@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
+	//@FactoryMethod(designator = "CalibrateNeural", parameterNames = {})
 	public static CalibrateNeural calibrateNeuralFactory() {
 		return new CalibrateNeural();
 	}

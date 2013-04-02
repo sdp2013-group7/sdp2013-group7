@@ -94,7 +94,7 @@ public class NavigateMilestone2 extends AbstractPlanner {
 	}
 
 	// Factory method to make NavigateMilestone2 appear in the list of strats in the simulator
-	@FactoryMethod(designator = "Navigate Milestone 2", parameterNames = {})
+	//@FactoryMethod(designator = "Navigate Milestone 2", parameterNames = {})
 	public static NavigateMilestone2 factoryMethod() {
 		
 		return new NavigateMilestone2();

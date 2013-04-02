@@ -98,16 +98,23 @@ public class Game2 extends AbstractPlanner {
     }
 
     // put strategy into simulator
-    @FactoryMethod(designator = "Game2", parameterNames = { "init", "no bounce shots" })
+//    @FactoryMethod(designator = "Game2", parameterNames = { "init", "no bounce shots" })
     
     public static Game2 Game2FactoryTesting2(boolean init, boolean notTriggerHappy) {
     	
         Game2 g = new Game2(init);
         return g;
     }
+    
+    @FactoryMethod(designator = "Game2", parameterNames = {} )
+    public static Game2 game2ForTournament() {
+    	Game2 g = new Game2(true);
+    	//g.setTriggerHappy(false);
+    	return g;
+    }
 
     // test method? seems like they were experimenting with values to see if it would improve initial performance
-    @FactoryMethod(designator = "Game2InitTest", parameterNames = { "angle (deg)" })
+//    @FactoryMethod(designator = "Game2InitTest", parameterNames = { "angle (deg)" })
     
     public static Game2 Game2InitTest(double angle) {
     	
