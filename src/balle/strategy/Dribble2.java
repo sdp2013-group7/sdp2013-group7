@@ -107,13 +107,18 @@ public class Dribble2 extends AbstractPlanner {
 	    	Line right = opponent.getRightSide();
 	    	Line front = opponent.getFrontSide();
 	    	Line back = opponent.getBackSide();
-	    	boolean areFacingUs = (us.distanceToFacingWall(front)>us.distanceToFacingWall(back));
+	    	
+	    	Coord frontp =front.closestPoint(us.getPosition());
+	    	Coord backp = back.closestPoint(us.getPosition());
+	    	boolean areFacingUs = (us.getPosition().dist(frontp)>us.getPosition().dist(backp));
 	    	
 	    	if (areFacingUs&&canScore&&(us.intersects(left)||us.intersects(right))&&!us.intersects(front)){
 	    		return true;
 	    	}else if (!areFacingUs&&canScore&&(us.intersects(left)||us.intersects(right))&&!us.intersects(back)){
 	    		return true;
-	    	}else{
+	    	}else if(canScore){
+	    		return true;
+	    	}else {
 	    		return false;
 	    	}
 	    	
@@ -317,7 +322,10 @@ public class Dribble2 extends AbstractPlanner {
 						controller.setWheelSpeeds(currentSpeed,currentSpeed+turnSpeedToUse/2);
 					}
 					
-				  } else if ((!facingGoal) && (angle < Math.PI - threshold)) {
+				}else if ((!us.getFacingLine().intersects(frontLine)&&!us.getFacingLine().intersects(backLine))&&facingGoal){
+					controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	    		}else if ((!facingGoal) && (angle < Math.PI - threshold)) {
 					controller.setWheelSpeeds(currentSpeed, currentSpeed
 	                        + turnSpeedToUse);
 				} else if ((!facingGoal) && (angle > Math.PI + threshold)) {
@@ -333,7 +341,10 @@ public class Dribble2 extends AbstractPlanner {
 					}else{
 						controller.setWheelSpeeds(currentSpeed+turnSpeedToUse/2,currentSpeed);
 					}
-				 } else if ((!facingGoal) && (angle > threshold)
+	        	}else if ((!us.getFacingLine().intersects(frontLine)&&!us.getFacingLine().intersects(backLine))&&facingGoal){
+					controller.setWheelSpeeds(Globals.MAXIMUM_MOTOR_SPEED,
+	                        Globals.MAXIMUM_MOTOR_SPEED);
+	    		} else if ((!facingGoal) && (angle > threshold)
 						&& (angle < Math.PI)) {
 	                controller.setWheelSpeeds(currentSpeed + turnSpeedToUse,
 							currentSpeed);

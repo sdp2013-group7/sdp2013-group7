@@ -133,7 +133,7 @@ public class Game2 extends AbstractPlanner {
 		backingOffStrategy = new BackingOffStrategy();
         turningExecutor = new IncFaceAngle();
         kickingStrategy = new Dribble2();
-        initialStrategy = new InitialBezierStrategy(180);
+        initialStrategy = new GoToBall(new GoToObjectPFN(0), false);
 		goToBallPFN = new GoToBallSafeProportional();
 		goToBallBezier = new SimpleGoToBallFaceGoal(new BezierNav(new SimplePathFinder(new CustomCHI())));
         goToBallPrecision = new GoToBall(new GoToObjectPFN(0), false);
@@ -302,7 +302,7 @@ public class Game2 extends AbstractPlanner {
         
         // if kickingstrat dribbling the ball and it's position is estimated and ball less than 2 robot lengths away or (ball in the dribblebox and robot not facing own goal)
         if ((kickingStrategy.isDribbling() && ball.getPosition().isEstimated() && ball
-                .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 2)
+                .getPosition().dist(ourRobot.getPosition()) < Globals.ROBOT_LENGTH * 3)
                 || (dribbleBox.containsCoord(ball.getPosition()) && !ourRobot
                         .isFacingGoalHalf(ownGoal))) {
         	
@@ -371,7 +371,7 @@ public class Game2 extends AbstractPlanner {
 
 
         // if not any of the above, use this one
-		return goToBallBezier;
+		return goToBallPFN;
 
 	}
 }
